@@ -32,7 +32,6 @@ export default class TransactionPage extends React.Component {
       startDate: null,
       endDate: null,
       focusedInput: null,
-      modal: false,
       modalTransaction: {},
       modalType: null,
       modalAmount: null,
@@ -102,7 +101,7 @@ export default class TransactionPage extends React.Component {
       modal: !this.state.modal,
       modalType: transaction.type,
       modalAmount: transaction.amount,
-      modalCategory: transaction.category || null,
+      modalCategory: transaction.wallet_id ? transaction.wallet_id._id : null,
       modalDescription: transaction.description || null,
       modalDate: moment(transaction.date).utc().format("YYYY-MM-DD")
     });
