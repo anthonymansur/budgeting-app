@@ -93,7 +93,7 @@ class DashboardPage extends Component {
     else if (event.target.name === "category" && event.target.value !== "none") {
       this.setState({ modalCategory: event.target.value });
     } else if (event.target.name === "amount") {
-      this.setState({ modalAmount: parseInt(event.target.value.substring(0,7)) });
+      this.setState({ modalAmount: parseFloat(event.target.value.substring(0,10)) });
     } else if (event.target.name === "description") {
       this.setState({ modalDescription: event.target.value.substring(0,26) });
     } else if (event.target.name === "date") {

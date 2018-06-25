@@ -110,7 +110,7 @@ export default class TransactionPage extends React.Component {
 
   onChange(event) {
     if (event.target.name === "amount") {
-      event.target.value <=  9999999 ? this.setState({ modalAmount: parseInt(event.target.value) }) : '';
+      this.setState({ modalAmount: parseFloat(event.target.value.substring(0,10)) });
     }
     else if (event.target.name === "category" && event.target.value !== "none") {
       this.setState({ modalCategory: event.target.value });
