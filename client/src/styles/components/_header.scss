@@ -1,0 +1,17 @@
+.header {
+  background-color:$dark-blue;
+}
+
+.header__brand {
+  // color:$off-white !important;
+  font-size: $font-size-large !important;
+}
+
+.header__text {
+  // color: $off-white !important;
+  font-size:$font-size-medium !important;
+}
+
+.header__text:hover {
+  // color:$dark-green !important;
+}

@@ -1,0 +1,9 @@
+.total-income{
+  color: $off-white
+}
+
+.display-3 {
+  @media (max-width: $desktop-breakpoint) {
+    font-size:$font-size-xlarge;
+  }
+}

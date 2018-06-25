@@ -1,0 +1,17 @@
+.card {
+  background: $off-white;
+}
+
+.card-title{
+  font-size: $font-size-large !important;
+  text-align: center;
+}
+
+.card-body {
+  font-size: $font-size-small !important;
+}
+
+.card__money {
+  font-size: $font-size-xlarge;
+  color:$green;
+}
