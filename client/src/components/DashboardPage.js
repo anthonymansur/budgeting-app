@@ -103,8 +103,8 @@ class DashboardPage extends Component {
 
   refreshState() {
     const newState={
-      modal: false,
       modalType: '',
+      modal: false,
       modalAmount: 0,
       modalDate: now,
       modalDescription: '',
@@ -113,6 +113,7 @@ class DashboardPage extends Component {
       modalName: '',
       modalPercentage: 0
     }
+    this.setState(newState);
   }
 
   errorCheck() {
@@ -190,7 +191,7 @@ class DashboardPage extends Component {
       } catch(e) {
         alert(e.message);
       }
-      this.toggle();
+      this.setState({ modal: false });
     }
   }
 
@@ -232,7 +233,7 @@ class DashboardPage extends Component {
       } catch(e) {
         alert(e.message);
       }
-      this.toggle();
+      this.setState({ modal: false });
     }
   }
 
@@ -256,7 +257,7 @@ class DashboardPage extends Component {
       } catch(e) {
         alert(e.message);
       } 
-      this.toggle();
+      this.setState({ modal: false });
     }
   }
 
@@ -270,10 +271,10 @@ class DashboardPage extends Component {
         } else {
           alert(res.data.message);
         }
-        this.toggle();
+        this.setState({ modal: false });
       } else {
         alert("You entered an incorrect name");
-        this.toggle();
+        this.setState({ modal: false });
       }
     } catch(e) {
       alert(e.message);
