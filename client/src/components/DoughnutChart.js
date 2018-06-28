@@ -56,7 +56,7 @@ export default class DoughnutChart extends React.Component {
         }
       });
 
-      expenseData.push((walletExpense / expenseTotal) * 100);
+      expenseData.push(((walletExpense / expenseTotal) * 100).toFixed(2));
       dataList.push(wallet.category);
       const color = wallet.color || this.randomColorGenerator();
       colorList.push(color);
