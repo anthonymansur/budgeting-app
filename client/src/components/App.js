@@ -7,6 +7,7 @@ import Footer from './Footer';
 import LoginPage from './LoginPage';
 import DashboardPage from './DashboardPage';
 import TransactionPage from './TransactionPage';
+import SummaryPage from './SummaryPage';
 
 export default class App extends Component {
 
@@ -30,6 +31,7 @@ export default class App extends Component {
             { this.state.auth ? <Header/> : '' }
             <Route exact path="/" render={() => this.state.auth ? <DashboardPage user={this.user.data}/> : <LoginPage />} />
             <Route exact path="/transactions" component={TransactionPage} />
+            <Route exact path="/summary" component={SummaryPage} />
             { this.state.auth ? <Footer/> : '' }
           </div>
         </BrowserRouter>

@@ -9,7 +9,7 @@ module.exports = (app) => {
 
   app.get("/api/transactions", async (req, res) => {
     try {
-      const transactions = await Transaction.find({ user_id: req.user.id }).populate("wallet_id");
+      const transactions = await Transaction.find({user_id: req.user.id}).populate("wallet_id");
       res.json({
         success: true,
         items: [transactions]
