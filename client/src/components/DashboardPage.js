@@ -404,7 +404,11 @@ class DashboardPage extends Component {
                     <Card onClick={() => this.editWalletToggle(wallet)}>
                     <CardBody className="text-center">
                       <CardTitle className="card__title">{wallet.category}</CardTitle>
-                      <p className="card__money">${this.getWalletBalance(wallet)}</p>
+                      {
+                        this.getWalletBalance(wallet) > 0 ?
+                        <p className="card__money">{numeral(this.getWalletBalance(wallet)).format('$0,0.00')}</p> :
+                        <p className="card__money--red">{numeral(this.getWalletBalance(wallet)).format('$0,0.00')}</p>
+                      }
                     </CardBody>
                     </Card>
                     <br />

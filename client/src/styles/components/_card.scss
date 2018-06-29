@@ -13,5 +13,10 @@
 
 .card__money {
   font-size: $font-size-xlarge;
-  color:$green;
+  color: $green;
+}
+
+.card__money--red {
+  @extend .card__money;
+  color: $red;
 }
