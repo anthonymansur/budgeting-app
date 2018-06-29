@@ -91,7 +91,10 @@ export default class DoughnutChart extends React.Component {
           data={data}
           options={{
             legend: {
-              position: "right"
+              position: "right",
+              labels: {
+                fontColor: "white"
+              }
             }
           }}
         />

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, FormFeedback, Label, Input, Row, Col, Card, CardBody, CardTitle, Jumbotron } from 'reactstrap';
+import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, FormFeedback, Label, Input, InputGroup, InputGroupAddon, Row, Col, Card, CardBody, CardTitle, Jumbotron } from 'reactstrap';
 import axios from "axios";
 import moment from "moment-timezone";
 import numeral from 'numeral';
@@ -341,7 +341,10 @@ class DashboardPage extends Component {
           <Form>
             <FormGroup>
               <Label for="amount">Amount</Label>
-              <Input invalid={this.state.modalAmountError} type="number" name="amount" id="amount" value={this.state.modalAmount || ''} onChange={this.onChange}/>
+              <InputGroup>
+                <InputGroupAddon addonType="prepend">$</InputGroupAddon>
+                <Input invalid={this.state.modalAmountError} type="number" name="amount" id="amount" value={this.state.modalAmount || ''} onChange={this.onChange}/>
+              </InputGroup>
               <FormFeedback>Please provide a positive amount</FormFeedback>
             </FormGroup>
             {
@@ -405,7 +408,7 @@ class DashboardPage extends Component {
                     <CardBody className="text-center">
                       <CardTitle className="card__title">{wallet.category}</CardTitle>
                       {
-                        this.getWalletBalance(wallet) > 0 ?
+                        this.getWalletBalance(wallet) >= 0 ?
                         <p className="card__money">{numeral(this.getWalletBalance(wallet)).format('$0,0.00')}</p> :
                         <p className="card__money--red">{numeral(this.getWalletBalance(wallet)).format('$0,0.00')}</p>
                       }
