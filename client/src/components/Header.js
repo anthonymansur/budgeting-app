@@ -44,7 +44,10 @@ export default class Header extends React.Component {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar style={{color: 'white'}}>
               <NavItem>
-                <NavLink href="/transactions" className="header__text">View Transactions</NavLink>
+                <NavLink href="/transactions" className="header__text">Transactions</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="/summary" className="header__text">Summary</NavLink>
               </NavItem>
             </Nav>
           </Collapse>

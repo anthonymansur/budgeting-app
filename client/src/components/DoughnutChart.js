@@ -25,7 +25,6 @@ export default class DoughnutChart extends React.Component {
   };
 
   componentWillReceiveProps(props) {
-    console.log(props);
     this.setState({ transactions: props.transactions, wallets: props.wallets });
     let expenseTotal = 0;
     const expenseData = [];
@@ -37,9 +36,6 @@ export default class DoughnutChart extends React.Component {
         expenseTotal += transaction.amount;
       }
     });
-
-    console.log(props.transactions);
-    console.log(props.wallets);
 
     props.wallets.forEach(wallet => {
       const filteredTrans = props.transactions.filter(transaction => {

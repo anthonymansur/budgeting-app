@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Button } from "reactstrap";
+import { Container, Row, Button, ButtonGroup } from "reactstrap";
 import axios from "axios";
 import numeral from "numeral";
 import moment from "moment-timezone";
@@ -8,6 +8,8 @@ import Expenses from "./Expenses";
 
 const TIMEZONE = "America/New_York";
 const now = moment().tz(TIMEZONE);
+
+//TODO: fix change date for week
 
 export default class SummaryPage extends React.Component {
   constructor() {
@@ -37,7 +39,6 @@ export default class SummaryPage extends React.Component {
       }
       const wRes = await axios.get("/api/wallets");
       if (wRes.data.success) {
-        console.log(wRes.data);
         this.setState({ wallets: wRes.data.items[0] });
       } else {
         throw new Error(wRes.data.message);
@@ -118,55 +119,153 @@ export default class SummaryPage extends React.Component {
     }
   };
 
+  changeDate = action => {
+    if (this.state.renderType === "year") {
+      const year = action === "less" ? this.state.year - 1 : this.state.year + 1;
+      const showTransactions = this.state.transactions.filter(trans => {
+        return moment(trans.date).year() === year;
+      })
+      this.setState({ showTransactions, year });
+    } else if (this.state.renderType === "month") {
+      let year = 0;
+      let month = 0;
+      if (action === "less") {
+        if (this.state.month > 0){
+          month = this.state.month - 1;
+          year = this.state.year;
+        }
+        else {
+          month = 11;
+          year = this.state.year - 1;
+        }  
+      } else {
+        if (this.state.month < 11) {
+          month = this.state.month + 1;
+          year = this.state.year;
+        } else {
+          month = 0;
+          year = this.state.year + 1;
+        }
+      } 
+      const showTransactions = this.state.transactions.filter(trans => {
+        return moment(trans.date).year() === year && moment(trans.date).month() === month;
+      });
+      this.setState({ showTransactions, year, month });
+    } else if (this.state.renderType === "week") {
+      let week;
+      let year;
+      if (action === "less") {
+        if (this.state.week > 1) {
+          week = this.state.week - 1;
+          year = this.state.year
+        } else {
+          week = 53;
+          year = this.state.year - 1;
+        }
+      } else {
+        if (this.state.week < 53) {
+          week = this.state.week + 1;
+          year = this.state.year;
+        } else {
+          week = 1;
+          year = this.state.year + 1;
+        }
+      }
+      const showTransactions = this.state.transactions.filter(trans => {
+        return moment(trans.date).year() === year && moment(trans.date).week() === week;
+      });
+      this.setState({ showTransactions, year, week });
+    } else {
+      let day;
+      let year;
+      if (action === "less") {
+        if (this.state.day > 1) {
+          day = this.state.day - 1;
+          year = this.state.year
+        } else {
+          day = 366;
+          year = this.state.year - 1;
+        }
+      } else {
+        if (this.state.day < 366) {
+          day = this.state.day + 1;
+          year = this.state.year;
+        } else {
+          day = 1;
+          year = this.state.year + 1;
+        }
+      }
+      const showTransactions = this.state.transactions.filter(trans => {
+        return moment(trans.date).year() === year && moment(trans.date).dayOfYear() === day;
+      });
+      this.setState({ showTransactions, year, day });
+    }
+  }
+
   render() {
+    let title = "";
+    if (this.state.renderType === "all") {
+      title = "Showing All Transactions";
+    } else if (this.state.renderType === "year") {
+      title = this.state.year;
+    } else if (this.state.renderType === "month") {
+      title = moment(`${this.state.month + 1}-${this.state.year}`, 'MM-YYYY').format('MMMM, YYYY');
+    } else if (this.state.renderType === "week") {
+      title =`${moment(`${this.state.year}-${this.state.week}`, 'YYYY-ww').format('MMMM DD')} to 
+      ${moment(`${this.state.year}-${this.state.week}`, 'YYYY-ww').add(7, "days").format('MMMM DD of YYYY')}`;
+    } else {
+      title = moment(`${this.state.year}-${this.state.day}`, 'YYYY-DDDD').format('MMMM DD, YYYY');
+    }
     return (
       <Container>
         <br />
-        <h1 className="white-text">June</h1>
+        <h1 className="white-text">{ title }</h1>
+        {this.state.renderType !== "all" ? 
+          <ButtonGroup style={{height:"35px"}}>
+            <Button color="info" onClick={() => this.changeDate("less")}><i className="medium material-icons">arrow_back</i></Button>
+            <Button color="info" onClick={() => this.changeDate("more")}><i className="medium material-icons">arrow_forward</i></Button>
+          </ButtonGroup> : 
+          ""
+        }
         <br />
         <DoughnutChart
           transactions={this.state.showTransactions}
           wallets={this.state.wallets}
         />
         <br />
-        <Row>
+        <Row className="d-flex justify-content-between">
           <Button
-            color="info"
+            color="link"
             disabled={this.state.renderType === "day"}
             onClick={() => this.onClick("day")}
-            style={{ marginLeft: "10px", marginRight: "10px" }}
           >
             Daily
           </Button>{" "}
           <Button
-            color="info"
+            color="link"
             disabled={this.state.renderType === "week"}
             onClick={() => this.onClick("week")}
-            style={{ marginRight: "10px" }}
           >
             Weekly
           </Button>{" "}
           <Button
-            color="info"
+            color="link"
             disabled={this.state.renderType === "month"}
             onClick={() => this.onClick("month")}
-            style={{ marginRight: "10px" }}
           >
             Monthly
           </Button>{" "}
           <Button
-            color="info"
+            color="link"
             disabled={this.state.renderType === "year"}
             onClick={() => this.onClick("year")}
-            style={{ marginRight: "10px" }}
           >
             Yearly
           </Button>{" "}
           <Button
-            color="info"
+            color="link"
             disabled={this.state.renderType === "all"}
             onClick={() => this.onClick("all")}
-            style={{ marginRight: "10px" }}
           >
             All-time
           </Button>{" "}
