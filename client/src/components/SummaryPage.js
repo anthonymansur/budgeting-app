@@ -124,7 +124,7 @@ export default class SummaryPage extends React.Component {
     if (this.state.renderType === "year") {
       const year = action === "less" ? this.state.year - 1 : this.state.year + 1;
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).year() === year;
+        return moment(trans.date).tz(TIMEZONE).year() === year;
       })
       this.setState({ showTransactions, year });
     } else if (this.state.renderType === "month") {
@@ -149,7 +149,7 @@ export default class SummaryPage extends React.Component {
         }
       } 
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).year() === year && moment(trans.date).month() === month;
+        return moment(trans.date).tz(TIMEZONE).year() === year && moment(trans.date).tz(TIMEZONE).month() === month;
       });
       this.setState({ showTransactions, year, month });
     } else if (this.state.renderType === "week") {
@@ -173,7 +173,7 @@ export default class SummaryPage extends React.Component {
         }
       }
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).year() === year && moment(trans.date).week() === week;
+        return moment(trans.date).tz(TIMEZONE).year() === year && moment(trans.date).tz(TIMEZONE).week() === week;
       });
       this.setState({ showTransactions, year, week });
     } else {
@@ -197,7 +197,7 @@ export default class SummaryPage extends React.Component {
         }
       }
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).year() === year && moment(trans.date).dayOfYear() === day;
+        return moment(trans.date).tz(TIMEZONE).year() === year && moment(trans.date).tz(TIMEZONE).dayOfYear() === day;
       });
       this.setState({ showTransactions, year, day });
     }
