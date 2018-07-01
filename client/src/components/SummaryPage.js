@@ -62,7 +62,7 @@ export default class SummaryPage extends React.Component {
       });
     } else if (renderType === "year") {
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).year() === now.year();
+        return moment(trans.date).utc().year() === now.year();
       });
       this.setState({
         showTransactions,
@@ -75,8 +75,8 @@ export default class SummaryPage extends React.Component {
     } else if (renderType === "month") {
       const showTransactions = this.state.transactions.filter(trans => {
         return (
-          moment(trans.date).year() === now.year() &&
-          moment(trans.date).month() === now.month()
+          moment(trans.date).utc().year() === now.year() &&
+          moment(trans.date).utc().month() === now.month()
         );
       });
       this.setState({
@@ -90,8 +90,8 @@ export default class SummaryPage extends React.Component {
     } else if (renderType === "week") {
       const showTransactions = this.state.transactions.filter(trans => {
         return (
-          moment(trans.date).year() === now.year() &&
-          moment(trans.date).week() === now.week()
+          moment(trans.date).utc().year() === now.year() &&
+          moment(trans.date).utc().week() === now.week()
         );
       });
       this.setState({
@@ -105,8 +105,8 @@ export default class SummaryPage extends React.Component {
     } else {
       const showTransactions = this.state.transactions.filter(trans => {
         return (
-          moment(trans.date).year() === now.year() &&
-          moment(trans.date).dayOfYear() === now.dayOfYear()
+          moment(trans.date).utc().year() === now.year() &&
+          moment(trans.date).utc().dayOfYear() === now.dayOfYear()
         );
       });
       this.setState({
@@ -124,7 +124,7 @@ export default class SummaryPage extends React.Component {
     if (this.state.renderType === "year") {
       const year = action === "less" ? this.state.year - 1 : this.state.year + 1;
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).tz(TIMEZONE).year() === year;
+        return moment(trans.date).utc().year() === year;
       })
       this.setState({ showTransactions, year });
     } else if (this.state.renderType === "month") {
@@ -149,7 +149,7 @@ export default class SummaryPage extends React.Component {
         }
       } 
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).tz(TIMEZONE).year() === year && moment(trans.date).tz(TIMEZONE).month() === month;
+        return moment(trans.date).utc().year() === year && moment(trans.date).utc().month() === month;
       });
       this.setState({ showTransactions, year, month });
     } else if (this.state.renderType === "week") {
@@ -173,7 +173,7 @@ export default class SummaryPage extends React.Component {
         }
       }
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).tz(TIMEZONE).year() === year && moment(trans.date).tz(TIMEZONE).week() === week;
+        return moment(trans.date).utc().year() === year && moment(trans.date).utc().week() === week;
       });
       this.setState({ showTransactions, year, week });
     } else {
@@ -197,7 +197,7 @@ export default class SummaryPage extends React.Component {
         }
       }
       const showTransactions = this.state.transactions.filter(trans => {
-        return moment(trans.date).tz(TIMEZONE).year() === year && moment(trans.date).tz(TIMEZONE).dayOfYear() === day;
+        return moment(trans.date).utc().year() === year && moment(trans.date).utc().dayOfYear() === day;
       });
       this.setState({ showTransactions, year, day });
     }

@@ -97,7 +97,7 @@ class DashboardPage extends Component {
     } else if (event.target.name === "description") {
       this.setState({ modalDescription: event.target.value.substring(0,26) });
     } else if (event.target.name === "date") {
-      this.setState({ modalDate: event.target.value });
+      this.setState({ modalDate: moment(event.target.value).tz(TIMEZONE).format("YYYY-MM-DD") });
     }
   }
 
