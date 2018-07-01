@@ -30,9 +30,10 @@ export default class SummaryPage extends React.Component {
     try {
       const res = await axios.get("/api/transactions");
       if (res.data.success) {
+        const expenses = res.data.items[0].filter(trans => { return trans.type === "remove" });
         this.setState({
-          transactions: res.data.items[0],
-          showTransactions: res.data.items[0]
+          transactions: expenses,
+          showTransactions: expenses
         });
       } else {
         throw new Error(res.data.message);
