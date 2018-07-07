@@ -229,6 +229,7 @@ export default class SummaryPage extends React.Component {
           ""
         }
         <br />
+        <br />
         <DoughnutChart
           transactions={this.state.showTransactions}
           wallets={this.state.wallets}
