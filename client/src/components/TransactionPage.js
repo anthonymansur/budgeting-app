@@ -22,6 +22,7 @@ import numeral from "numeral";
 import "react-dates/initialize";
 import { DateRangePicker } from "react-dates";
 import "react-dates/lib/css/_datepicker.css";
+import ToggleButton from "react-toggle-button";
 
 export default class TransactionPage extends React.Component {
   constructor() {
@@ -37,7 +38,8 @@ export default class TransactionPage extends React.Component {
       modalAmount: null,
       modalCategory: "",
       modalDate: null,
-      modalDescription: null
+      modalDescription: null,
+      modalValue: null
     };
     this.getAmount = this.getAmount.bind(this);
     this.renderTable = this.renderTable.bind(this);
@@ -94,6 +96,7 @@ export default class TransactionPage extends React.Component {
   }
 
   editToggle(transaction) {
+    console.log(transaction.taxable);
     this.setState({
       modalTransaction: transaction,
       modal: !this.state.modal,
@@ -103,8 +106,23 @@ export default class TransactionPage extends React.Component {
       modalDescription: transaction.description || null,
       modalDate: moment(transaction.date)
         .utc()
-        .format("YYYY-MM-DD")
+        .format("YYYY-MM-DD"),
+      modalValue:
+        transaction.type === "add"
+          ? transaction.taxable !== undefined
+            ? transaction.taxable
+            : true
+          : transaction.taxable !== undefined
+            ? !transaction.taxable
+            : false
     });
+    console.log(transaction.type === "add"
+    ? transaction.taxable
+      ? transaction.taxable
+      : true
+    : transaction.taxable
+      ? !transaction.taxable
+      : false);
   }
 
   onChange(event) {
@@ -119,24 +137,30 @@ export default class TransactionPage extends React.Component {
     }
   }
 
+  refreshState = () => {
+    this.setState({
+      modalDescription: null,
+      modalAmount: null,
+      modalDate: null,
+      modalCategory: null,
+      modalValue: null,
+      modal: !this.state.modal
+    });
+  };
+
   async onEditTransaction() {
     const body = {
       description: this.state.modalDescription,
       amount: this.state.modalAmount,
       date: this.state.modalDate,
       wallet_id: this.state.modalCategory,
-      transaction_id: this.state.modalTransaction._id
+      transaction_id: this.state.modalTransaction._id,
+      taxable: this.state.modalType === "add" ? this.state.modalValue : !this.state.modalValue
     };
     try {
       const res = await axios.put("/api/transactions", body);
       if (res.data.success) {
-        this.setState({
-          modalDescription: null,
-          modalAmount: null,
-          modalDate: null,
-          modalCategory: null,
-          modal: !this.state.modal
-        });
+        this.refreshState();
         this.componentDidMount();
       } else {
         alert(res.data.message);
@@ -151,13 +175,7 @@ export default class TransactionPage extends React.Component {
     try {
       const res = await axios.delete(`/api/transactions?id=${transactionId}`);
       if (res.data.success) {
-        this.setState({
-          modalDescription: null,
-          modalAmount: null,
-          modalDate: null,
-          modalCategory: null,
-          modal: !this.state.modal
-        });
+        this.refreshState();
         this.componentDidMount();
       } else {
         alert(res.data.message);
@@ -322,15 +340,6 @@ export default class TransactionPage extends React.Component {
                 onChange={this.onChange}
               />
             </FormGroup>
-            <FormGroup>
-              <Label>Date</Label>
-              <Input
-                type="date"
-                name="date"
-                value={this.state.modalDate}
-                onChange={this.onChange}
-              />
-            </FormGroup>
             {this.state.modalType === "remove" ? (
               <FormGroup>
                 <Label>Category</Label>
@@ -367,6 +376,60 @@ export default class TransactionPage extends React.Component {
                     );
                   })}
                 </Input>
+              </FormGroup>
+            )}
+            <FormGroup>
+              <Label>Date</Label>
+              <Input
+                type="date"
+                name="date"
+                value={this.state.modalDate}
+                onChange={this.onChange}
+              />
+            </FormGroup>
+            {this.state.modalType === "add" ? (
+              <FormGroup>
+                <Label>Taxable</Label>
+                <ToggleButton
+                  inactiveLabel={
+                    <i className="material-icons" style={{ fontSize: "2rem" }}>
+                      close
+                    </i>
+                  }
+                  activeLabel={
+                    <i className="material-icons" style={{ fontSize: "2rem" }}>
+                      check
+                    </i>
+                  }
+                  value={this.state.modalValue}
+                  onToggle={value => {
+                    this.setState({
+                      modalValue: !value
+                    });
+                  }}
+                />
+              </FormGroup>
+            ) : (
+              <FormGroup>
+                <Label>Tax Deductable</Label>
+                <ToggleButton
+                  inactiveLabel={
+                    <i className="material-icons" style={{ fontSize: "2rem" }}>
+                      close
+                    </i>
+                  }
+                  activeLabel={
+                    <i className="material-icons" style={{ fontSize: "2rem" }}>
+                      check
+                    </i>
+                  }
+                  value={this.state.modalValue}
+                  onToggle={value => {
+                    this.setState({
+                      modalValue: !value
+                    });
+                  }}
+                />
               </FormGroup>
             )}
             <FormGroup>

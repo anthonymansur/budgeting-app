@@ -55,19 +55,6 @@ class DashboardPage extends Component {
       wallets: [],
       remainingPercentage: 100
     };
-    this.toggle = this.toggle.bind(this);
-    this.addMoneyToggle = this.addMoneyToggle.bind(this);
-    this.removeMoneyToggle = this.removeMoneyToggle.bind(this);
-    this.addWalletToggle = this.addWalletToggle.bind(this);
-    this.editWalletToggle = this.editWalletToggle.bind(this);
-    this.addToWallet = this.addToWallet.bind(this);
-    this.errorCheck = this.errorCheck.bind(this);
-    this.editWallet = this.editWallet.bind(this);
-    this.confirmDelete = this.confirmDelete.bind(this);
-    this.onChange = this.onChange.bind(this);
-    this.getWalletBalance = this.getWalletBalance.bind(this);
-    this.refreshState = this.refreshState.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
     this._ismounted = false;
   }
 
@@ -218,7 +205,8 @@ class DashboardPage extends Component {
         description: this.state.modalDescription,
         wallet_id: this.state.modalCategory,
         date: this.state.modalDate,
-        taxable: this.state.modalType === "add-money" ? this.state.modalValue : !this.state.modalValue
+        taxable:
+          this.state.modalType === "add-money" ? this.state.modalValue : !this.state.modalValue
       };
       try {
         const res = await axios.post("/api/transactions", body);
@@ -325,9 +313,7 @@ class DashboardPage extends Component {
     let delta = 0;
     this.state.transactions.forEach(transaction => {
       if (transaction.wallet_id && transaction.wallet_id._id === wallet._id) {
-          transaction.type === "add"
-            ? (delta += transaction.amount)
-            : (delta -= transaction.amount);
+        transaction.type === "add" ? (delta += transaction.amount) : (delta -= transaction.amount);
       }
     });
     return (this.state.generalIncome * (wallet.percentage / 100) + delta).toFixed(2);
@@ -562,7 +548,9 @@ class DashboardPage extends Component {
                   </div>
                   <div className="col-auto">
                     <strong>
-                      {numeral(this.state.income + this.state.generalIncome - this.state.expenses).format("$0,0.00")}
+                      {numeral(
+                        this.state.income + this.state.generalIncome - this.state.expenses
+                      ).format("$0,0.00")}
                     </strong>
                   </div>
                 </Row>
