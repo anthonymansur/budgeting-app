@@ -8,6 +8,7 @@ import LoginPage from "./LoginPage";
 import DashboardPage from "./DashboardPage";
 import TransactionPage from "./TransactionPage";
 import SummaryPage from "./SummaryPage";
+import LoanPage from "./LoanPage";
 
 export default class App extends Component {
   constructor() {
@@ -45,6 +46,7 @@ export default class App extends Component {
             />
             <Route exact path="/transactions" component={TransactionPage} />
             <Route exact path="/summary" component={SummaryPage} />
+            <Route exact path="/loans" component={LoanPage} />
             {this.state.auth ? <Footer /> : ""}
           </div>
         </BrowserRouter>

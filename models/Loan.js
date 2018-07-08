@@ -7,7 +7,11 @@ const loanSchema = new Schema({
   loan_donor: String,
   type: {
     type: String,
-    enum: ['donating', 'receiving']
+    enum: ['donated', 'received']
+  },
+  status: {
+    type: String,
+    enum: ["paid", "not_paid", "forgiven"]
   },
   date: Date,
   description: String,

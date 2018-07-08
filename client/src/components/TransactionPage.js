@@ -41,17 +41,9 @@ export default class TransactionPage extends React.Component {
       modalDescription: null,
       modalValue: null
     };
-    this.getAmount = this.getAmount.bind(this);
-    this.renderTable = this.renderTable.bind(this);
-    this.toggle = this.toggle.bind(this);
-    this.editToggle = this.editToggle.bind(this);
-    this.renderModal = this.renderModal.bind(this);
-    this.onChange = this.onChange.bind(this);
-    this.onEditTransaction = this.onEditTransaction.bind(this);
-    this.onDeleteTransaction = this.onDeleteTransaction.bind(this);
   }
 
-  getAmount(type) {
+  getAmount = (type) => {
     let amount = 0;
     this.state.transactions.forEach(transaction => {
       if (transaction.type === type) {
@@ -91,11 +83,11 @@ export default class TransactionPage extends React.Component {
     }
   }
 
-  toggle() {
+  toggle = () => {
     this.setState({ modal: !this.state.modal });
   }
 
-  editToggle(transaction) {
+  editToggle = (transaction) => {
     console.log(transaction.taxable);
     this.setState({
       modalTransaction: transaction,
@@ -125,7 +117,7 @@ export default class TransactionPage extends React.Component {
       : false);
   }
 
-  onChange(event) {
+  onChange = (event) => {
     if (event.target.name === "amount") {
       this.setState({ modalAmount: parseFloat(event.target.value.substring(0, 10)) });
     } else if (event.target.name === "category" && event.target.value !== "none") {
@@ -148,7 +140,7 @@ export default class TransactionPage extends React.Component {
     });
   };
 
-  async onEditTransaction() {
+  onEditTransaction = async () => {
     const body = {
       description: this.state.modalDescription,
       amount: this.state.modalAmount,
@@ -170,7 +162,7 @@ export default class TransactionPage extends React.Component {
     }
   }
 
-  async onDeleteTransaction() {
+  onDeleteTransaction = async () => {
     const transactionId = this.state.modalTransaction._id;
     try {
       const res = await axios.delete(`/api/transactions?id=${transactionId}`);
@@ -185,7 +177,7 @@ export default class TransactionPage extends React.Component {
     }
   }
 
-  renderTable(type) {
+  renderTable = (type) => {
     return (
       <Card>
         <CardBody>
@@ -325,7 +317,7 @@ export default class TransactionPage extends React.Component {
     );
   }
 
-  renderModal() {
+  renderModal = () => {
     return (
       <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
         <ModalHeader toggle={this.toggle}>Edit Transaction</ModalHeader>
