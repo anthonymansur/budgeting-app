@@ -325,7 +325,6 @@ class DashboardPage extends Component {
     let delta = 0;
     this.state.transactions.forEach(transaction => {
       if (transaction.wallet_id && transaction.wallet_id._id === wallet._id) {
-        if (transaction.type === "add")
           transaction.type === "add"
             ? (delta += transaction.amount)
             : (delta -= transaction.amount);
@@ -563,7 +562,7 @@ class DashboardPage extends Component {
                   </div>
                   <div className="col-auto">
                     <strong>
-                      {numeral(this.state.income - this.state.expenses).format("$0,0.00")}
+                      {numeral(this.state.income + this.state.generalIncome - this.state.expenses).format("$0,0.00")}
                     </strong>
                   </div>
                 </Row>
