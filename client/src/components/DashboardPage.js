@@ -23,6 +23,7 @@ import {
 import axios from "axios";
 import moment from "moment-timezone";
 import numeral from "numeral";
+import ToggleButton from "react-toggle-button";
 
 const TIMEZONE = "America/New_York";
 const now = moment()
@@ -46,6 +47,7 @@ class DashboardPage extends Component {
       modalNameError: false,
       modalPercentage: 0,
       modalPercentageError: false,
+      modalValue: false,
       income: 0,
       generalIncome: 0,
       expenses: 0,
@@ -66,9 +68,11 @@ class DashboardPage extends Component {
     this.getWalletBalance = this.getWalletBalance.bind(this);
     this.refreshState = this.refreshState.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this._ismounted = false;
   }
 
   async componentDidMount() {
+    this._ismounted = true;
     try {
       const errorMessage = "";
       const walletResponse = await axios.get("/api/wallets");
@@ -95,8 +99,10 @@ class DashboardPage extends Component {
         let generalIncome = 0;
         let expenses = 0;
         this.state.transactions.forEach(transaction => {
-          if (transaction.type === "add" ) {
-            transaction.wallet_id ? income += transaction.amount : generalIncome += transaction.amount;
+          if (transaction.type === "add") {
+            transaction.wallet_id
+              ? (income += transaction.amount)
+              : (generalIncome += transaction.amount);
           } else if (transaction.type === "remove") {
             expenses += transaction.amount;
           }
@@ -108,7 +114,7 @@ class DashboardPage extends Component {
     }
   }
 
-  onChange(event) {
+  onChange = event => {
     if (event.target.name === "wallet-name") {
       this.setState({ modalName: event.target.value.substring(0, 16) });
     } else if (event.target.name === "slider") {
@@ -128,9 +134,9 @@ class DashboardPage extends Component {
           .format("YYYY-MM-DD")
       });
     }
-  }
+  };
 
-  refreshState() {
+  refreshState = () => {
     const newState = {
       modalType: "",
       modal: false,
@@ -140,12 +146,13 @@ class DashboardPage extends Component {
       modalCategory: "",
       modalWallet: {},
       modalName: "",
-      modalPercentage: 0
+      modalPercentage: 0,
+      modalValue: false
     };
     this.setState(newState);
-  }
+  };
 
-  errorCheck() {
+  errorCheck = () => {
     let valid = true;
     if (this.state.modalType.slice(-5) !== "money") {
       if (this.state.modalName === "") {
@@ -176,39 +183,42 @@ class DashboardPage extends Component {
     }
     console.log(valid);
     return valid;
-  }
+  };
 
-  toggle() {
+  toggle = () => {
     this.setState({
       modal: !this.state.modal
     });
     this.refreshState();
-  }
+  };
 
-  addMoneyToggle() {
+  addMoneyToggle = () => {
     this.setState({
       modal: !this.state.modal,
       modalType: "add-money",
       modalCategory: null,
-      modalDate: now
+      modalDate: now,
+      modalValue: true
     });
-  }
+  };
 
-  removeMoneyToggle() {
+  removeMoneyToggle = () => {
     this.setState({
       modal: !this.state.modal,
-      modalType: "remove-money"
+      modalType: "remove-money",
+      modalValue: false
     });
-  }
+  };
 
-  async onSubmit() {
+  onSubmit = async () => {
     if (this.errorCheck()) {
       const body = {
         type: this.state.modalType === "add-money" ? "add" : "remove",
         amount: this.state.modalAmount,
         description: this.state.modalDescription,
         wallet_id: this.state.modalCategory,
-        date: this.state.modalDate
+        date: this.state.modalDate,
+        taxable: this.state.modalType === "add-money" ? this.state.modalValue : !this.state.modalValue
       };
       try {
         const res = await axios.post("/api/transactions", body);
@@ -223,16 +233,16 @@ class DashboardPage extends Component {
       }
       this.setState({ modal: false });
     }
-  }
+  };
 
-  addWalletToggle() {
+  addWalletToggle = () => {
     this.setState({
       modal: !this.state.modal,
       modalName: "",
       modalType: "add-wallet",
       modalPercentage: this.state.remainingPercentage
     });
-  }
+  };
 
   editWalletToggle(wallet) {
     this.setState({
@@ -468,6 +478,51 @@ class DashboardPage extends Component {
                 onChange={this.onChange}
               />
             </FormGroup>
+            {this.state.modalType === "add-money" ? (
+              <FormGroup>
+                <Label for="tax">Taxable</Label>
+                <ToggleButton
+                  inactiveLabel={
+                    <i className="material-icons" style={{ fontSize: "2rem" }}>
+                      close
+                    </i>
+                  }
+                  activeLabel={
+                    <i className="material-icons" style={{ fontSize: "2rem" }}>
+                      check
+                    </i>
+                  }
+                  value={this.state.modalValue}
+                  onToggle={value => {
+                    this.setState({
+                      modalValue: !value
+                    });
+                  }}
+                />
+              </FormGroup>
+            ) : (
+              <FormGroup>
+                <Label for="tax">Tax Deductible</Label>
+                <ToggleButton
+                  inactiveLabel={
+                    <i className="material-icons" style={{ fontSize: "2rem" }}>
+                      close
+                    </i>
+                  }
+                  activeLabel={
+                    <i className="material-icons" style={{ fontSize: "2rem" }}>
+                      check
+                    </i>
+                  }
+                  value={this.state.modalValue}
+                  onToggle={value => {
+                    this.setState({
+                      modalValue: !value
+                    });
+                  }}
+                />
+              </FormGroup>
+            )}
             <FormGroup>
               <Label for="description">Description</Label>
               <Input
@@ -568,7 +623,7 @@ class DashboardPage extends Component {
                   </Col>
                 </Row>
               </div>
-            ) : (
+            ) : this._ismounted ? (
               <div>
                 <div style={{ marginBottom: window.innerHeight * 0.1 }} />
                 <div style={{ width: window.innerwidth * 0.8 }}>
@@ -589,6 +644,8 @@ class DashboardPage extends Component {
                   </Jumbotron>
                 </div>
               </div>
+            ) : (
+              ""
             )}
           </Col>
           <Col md="3" />

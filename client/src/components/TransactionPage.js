@@ -35,7 +35,7 @@ export default class TransactionPage extends React.Component {
       modalTransaction: {},
       modalType: null,
       modalAmount: null,
-      modalCategory: null,
+      modalCategory: "",
       modalDate: null,
       modalDescription: null
     };
@@ -55,9 +55,7 @@ export default class TransactionPage extends React.Component {
       if (transaction.type === type) {
         if (
           (!this.state.startDate ||
-            moment(transaction.date).isSameOrAfter(
-              moment(this.state.startDate)
-            )) &&
+            moment(transaction.date).isSameOrAfter(moment(this.state.startDate))) &&
           (!this.state.endDate ||
             moment(transaction.date).isSameOrBefore(moment(this.state.endDate)))
         ) {
@@ -70,7 +68,7 @@ export default class TransactionPage extends React.Component {
 
   async componentDidMount() {
     try {
-      const errorMessage = '';
+      const errorMessage = "";
       const transactionResponse = await axios.get("/api/transactions");
       if (transactionResponse.data.success) {
         this.setState({ transactions: transactionResponse.data.items[0] });
@@ -85,7 +83,7 @@ export default class TransactionPage extends React.Component {
       }
       if (errorMessage) {
         alert(errorMessage);
-      } 
+      }
     } catch (e) {
       alert(e.message);
     }
@@ -103,21 +101,21 @@ export default class TransactionPage extends React.Component {
       modalAmount: transaction.amount,
       modalCategory: transaction.wallet_id ? transaction.wallet_id._id : null,
       modalDescription: transaction.description || null,
-      modalDate: moment(transaction.date).utc().format("YYYY-MM-DD")
+      modalDate: moment(transaction.date)
+        .utc()
+        .format("YYYY-MM-DD")
     });
   }
 
   onChange(event) {
     if (event.target.name === "amount") {
-      this.setState({ modalAmount: parseFloat(event.target.value.substring(0,10)) });
-    }
-    else if (event.target.name === "category" && event.target.value !== "none") {
+      this.setState({ modalAmount: parseFloat(event.target.value.substring(0, 10)) });
+    } else if (event.target.name === "category" && event.target.value !== "none") {
       this.setState({ modalCategory: event.target.value });
-    }
-    else if (event.target.name === "date") {
+    } else if (event.target.name === "date") {
       this.setState({ modalDate: event.target.value });
     } else if (event.target.name === "description") {
-      this.setState({ modalDescription: event.target.value.substring(0,26) });
+      this.setState({ modalDescription: event.target.value.substring(0, 26) });
     }
   }
 
@@ -125,10 +123,10 @@ export default class TransactionPage extends React.Component {
     const body = {
       description: this.state.modalDescription,
       amount: this.state.modalAmount,
-      date: this.state.modalDate, 
+      date: this.state.modalDate,
       wallet_id: this.state.modalCategory,
       transaction_id: this.state.modalTransaction._id
-    }
+    };
     try {
       const res = await axios.put("/api/transactions", body);
       if (res.data.success) {
@@ -179,19 +177,25 @@ export default class TransactionPage extends React.Component {
                 <h1>{type === "add" ? "Income:" : "Expenses:"}</h1>
               </div>
               <div className="col-auto">
-                <strong>
-                  {numeral(this.getAmount(type)).format("$0,0.00")}
-                </strong>
+                <strong>{numeral(this.getAmount(type)).format("$0,0.00")}</strong>
               </div>
             </Row>
           </CardTitle>
           <Table>
             <thead>
               <tr>
-                <th>{ window.innerWidth < 400 ? "$" : "Amount"}</th>
+                <th>{window.innerWidth < 400 ? "$" : "Amount"}</th>
                 <th>Date</th>
-                {type === "remove" ? window.innerWidth < 400 ? <th>Cat.</th> : <th>Category</th> : ""}
-                <th>{ window.innerWidth < 400 ? "Desc." : "Description"}</th>
+                {type === "remove" ? (
+                  window.innerWidth < 400 ? (
+                    <th>Cat.</th>
+                  ) : (
+                    <th>Category</th>
+                  )
+                ) : (
+                  ""
+                )}
+                <th>{window.innerWidth < 400 ? "Desc." : "Description"}</th>
               </tr>
             </thead>
             <tbody>
@@ -200,25 +204,49 @@ export default class TransactionPage extends React.Component {
                   return (
                     transaction.type === type &&
                     (!this.state.startDate ||
-                      moment(transaction.date).isSameOrAfter(
-                        moment(this.state.startDate)
-                      )) &&
+                      moment(transaction.date).isSameOrAfter(moment(this.state.startDate))) &&
                     (!this.state.endDate ||
-                      moment(transaction.date).isSameOrBefore(
-                        moment(this.state.endDate)
-                      ))
+                      moment(transaction.date).isSameOrBefore(moment(this.state.endDate)))
                   );
                 })
                 .sort((a, b) => {
-                  if (moment(a.date).utc().years() > moment(b.date).utc().years()) {
+                  if (
+                    moment(a.date)
+                      .utc()
+                      .years() >
+                    moment(b.date)
+                      .utc()
+                      .years()
+                  ) {
                     return -1;
-                  } else if (moment(a.date).utc().years() < moment(b.date).utc().years()) {
+                  } else if (
+                    moment(a.date)
+                      .utc()
+                      .years() <
+                    moment(b.date)
+                      .utc()
+                      .years()
+                  ) {
                     return 1;
-                  } else if (moment(a.date).utc().dayOfYear() > moment(b.date).utc().dayOfYear()) {
+                  } else if (
+                    moment(a.date)
+                      .utc()
+                      .dayOfYear() >
+                    moment(b.date)
+                      .utc()
+                      .dayOfYear()
+                  ) {
                     return -1;
-                  } else if (moment(a.date).utc().dayOfYear() < moment(b.date).utc().dayOfYear()) {
+                  } else if (
+                    moment(a.date)
+                      .utc()
+                      .dayOfYear() <
+                    moment(b.date)
+                      .utc()
+                      .dayOfYear()
+                  ) {
                     return 1;
-                  } else if (a.amount > b.amount){
+                  } else if (a.amount > b.amount) {
                     return -1;
                   } else if (a.amount < b.amount) {
                     return 1;
@@ -230,37 +258,45 @@ export default class TransactionPage extends React.Component {
                   return (
                     <tr key={transaction._id} onClick={() => this.editToggle(transaction)}>
                       <th scope="row">
-                      {window.innerWidth < 400 ? 
-                        numeral(transaction.amount).format('$0,0') : 
-                        numeral(transaction.amount).format('$0,0.00')}
+                        {window.innerWidth < 400
+                          ? numeral(transaction.amount).format("$0,0")
+                          : numeral(transaction.amount).format("$0,0.00")}
                       </th>
                       <td>
-                        {window.innerWidth < 400 ? 
-                          moment(transaction.date).utc().format("MMM DD, YYYY") : 
-                          moment(transaction.date).utc().format("MMMM DD, YYYY")}
+                        {window.innerWidth < 400
+                          ? moment(transaction.date)
+                              .utc()
+                              .format("MM/DD/YY")
+                          : moment(transaction.date)
+                              .utc()
+                              .format("MMMM DD, YYYY")}
                       </td>
                       {type === "remove" ? (
                         transaction.wallet_id ? (
                           <td>
-                          {window.innerWidth < 350 ? 
-                            transaction.wallet_id.category.length > 5 ? `${transaction.wallet_id.category.substring(0,6)}.` : 
-                            `${transaction.wallet_id.category.substring(0,6)}`:
-                            transaction.wallet_id.category
-                          }
+                            {window.innerWidth < 350
+                              ? transaction.wallet_id.category.length > 5
+                                ? `${transaction.wallet_id.category.substring(0, 6)}.`
+                                : `${transaction.wallet_id.category.substring(0, 6)}`
+                              : transaction.wallet_id.category}
                           </td>
                         ) : (
                           <td>deleted</td>
                         )
                       ) : (
-                        ''
+                        ""
                       )}
-                      <td>{ window.innerWidth < 400 ? 
-                          window.innerWidth < 350 ? 
-                        transaction.description ? 
-                        transaction.description.length > 6 ? (`${transaction.description.substring(0,7)}.`) : 
-                        (`${transaction.description.substring(0,7)}`) : "None" :
-                        ((`${transaction.description.substring(0,10)}`) || "None") 
-                        : (transaction.description || "None")}</td>
+                      <td>
+                        {transaction.description
+                          ? window.innerWidth < 400
+                            ? window.innerWidth < 350
+                              ? transaction.description.length > 6
+                                ? `${transaction.description.substring(0, 7)}.`
+                                : `${transaction.description.substring(0, 7)}`
+                              : transaction.description.substring(0, 10)
+                            : transaction.description
+                          : "None"}
+                      </td>
                     </tr>
                   );
                 })}
@@ -273,41 +309,74 @@ export default class TransactionPage extends React.Component {
 
   renderModal() {
     return (
-      <Modal
-        isOpen={this.state.modal}
-        toggle={this.toggle}
-        className={this.props.className}
-      >
+      <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
         <ModalHeader toggle={this.toggle}>Edit Transaction</ModalHeader>
         <ModalBody>
           <Form>
             <FormGroup>
               <Label>Amount</Label>
-              <Input type="number" name="amount" value={this.state.modalAmount} onChange={this.onChange}/>
+              <Input
+                type="number"
+                name="amount"
+                value={this.state.modalAmount}
+                onChange={this.onChange}
+              />
             </FormGroup>
             <FormGroup>
               <Label>Date</Label>
-              <Input type="date" name="date" value={this.state.modalDate} onChange={this.onChange}/>
+              <Input
+                type="date"
+                name="date"
+                value={this.state.modalDate}
+                onChange={this.onChange}
+              />
             </FormGroup>
             {this.state.modalType === "remove" ? (
               <FormGroup>
                 <Label>Category</Label>
-                <Input type="select" name="category" value={this.state.modalCategory} onChange={this.onChange}>
-                {
-                  this.state.wallets.map(wallet => {
+                <Input
+                  type="select"
+                  name="category"
+                  value={this.state.modalCategory}
+                  onChange={this.onChange}
+                >
+                  {this.state.wallets.map(wallet => {
                     return (
-                      <option key={wallet._id} value={wallet._id}>{wallet.category}</option>
+                      <option key={wallet._id} value={wallet._id}>
+                        {wallet.category}
+                      </option>
                     );
-                  })
-                }
+                  })}
                 </Input>
               </FormGroup>
             ) : (
-              ""
+              <FormGroup>
+                <Label>Wallet</Label>
+                <Input
+                  type="select"
+                  name="category"
+                  value={this.state.modalCategory}
+                  onChange={this.onChange}
+                >
+                  <option value="none">Select a category</option>
+                  {this.state.wallets.map(wallet => {
+                    return (
+                      <option key={wallet._id} value={wallet._id}>
+                        {wallet.category}
+                      </option>
+                    );
+                  })}
+                </Input>
+              </FormGroup>
             )}
             <FormGroup>
               <Label>Description</Label>
-              <Input type="text" name="description" value={this.state.modalDescription} onChange={this.onChange}/>
+              <Input
+                type="text"
+                name="description"
+                value={this.state.modalDescription}
+                onChange={this.onChange}
+              />
             </FormGroup>
           </Form>
         </ModalBody>
@@ -337,9 +406,7 @@ export default class TransactionPage extends React.Component {
               startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
               endDate={this.state.endDate} // momentPropTypes.momentObj or null,
               endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
-              onDatesChange={({ startDate, endDate }) =>
-                this.setState({ startDate, endDate })
-              } // PropTypes.func.isRequired,
+              onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
               focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
               onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
               small={true}

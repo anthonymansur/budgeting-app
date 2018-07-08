@@ -19,6 +19,10 @@ const transactionSchema = new Schema({
   amount: Number,
   description: String,
   date: Date,
+  taxable: {
+    type: Boolean,
+    default: true
+  },
   user_id:{
     type: mongoose.Schema.ObjectId,
     ref: "User"

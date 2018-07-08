@@ -28,7 +28,8 @@ module.exports = app => {
       amount: req.body.amount,
       user_id: req.user.id,
       wallet_id: req.body.wallet_id || null,
-      date: moment(req.body.date).toDate()
+      date: moment(req.body.date).toDate(),
+      taxable: req.body.taxable
     };
     const transaction = new Transaction(params);
     try {
@@ -49,7 +50,8 @@ module.exports = app => {
       description: req.body.description,
       amount: req.body.amount,
       date: req.body.date,
-      wallet_id: req.body.wallet_id || null
+      wallet_id: req.body.wallet_id || null,
+      taxable: req.body.taxable
     };
     try {
       await Transaction.findByIdAndUpdate(req.body.transaction_id, params);
