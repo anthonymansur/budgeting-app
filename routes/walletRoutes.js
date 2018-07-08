@@ -6,16 +6,16 @@ const ObjectId = require("mongoose").Types.ObjectId;
 module.exports = app => {
   app.get("/api/wallets", async (req, res) => {
     try {
-      const wallets = await Wallet.find({ user_id: req.user.id});
+      const wallets = await Wallet.find({ user_id: req.user.id });
       res.json({
         success: true,
         items: [wallets]
-      })
-    } catch(e) {
+      });
+    } catch (e) {
       res.json({
         success: false,
         message: e.message
-      })
+      });
     }
   });
   app.post("/api/wallets", async (req, res) => {
@@ -27,7 +27,7 @@ module.exports = app => {
       res.json({
         success: true
       });
-    } catch(e) {
+    } catch (e) {
       res.json({
         success: false,
         message: e.message
@@ -43,7 +43,7 @@ module.exports = app => {
       res.json({
         success: true
       });
-    } catch(e) {
+    } catch (e) {
       res.json({
         success: false,
         message: e.message
@@ -58,7 +58,7 @@ module.exports = app => {
       res.json({
         success: true
       });
-    } catch(e) {
+    } catch (e) {
       res.json({
         success: false,
         message: e.message
