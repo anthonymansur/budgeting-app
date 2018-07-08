@@ -15,5 +15,6 @@ db.on('error', function (error) {
 module.exports = {
     User: require(`./User`),
     Transaction: require('./Transaction'),
-    Wallet: require('./Wallet')
+    Wallet: require('./Wallet'),
+    Loan: require('./Loan')
 };
