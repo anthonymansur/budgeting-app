@@ -168,7 +168,6 @@ class DashboardPage extends Component {
         this.setState({ modalCategoryError: false });
       }
     }
-    console.log(valid);
     return valid;
   };
 
@@ -232,7 +231,7 @@ class DashboardPage extends Component {
     });
   };
 
-  editWalletToggle(wallet) {
+  editWalletToggle = (wallet) => {
     this.setState({
       modal: !this.state.modal,
       modalWallet: wallet,
@@ -244,7 +243,7 @@ class DashboardPage extends Component {
     });
   }
 
-  async addToWallet() {
+  addToWallet = async () => {
     if (this.errorCheck()) {
       const body = {
         category: this.state.modalName,
@@ -265,7 +264,7 @@ class DashboardPage extends Component {
     }
   }
 
-  async editWallet() {
+  editWallet = async () => {
     if (this.errorCheck()) {
       const body = {
         wallet_id: this.state.modalWallet._id,
@@ -289,7 +288,7 @@ class DashboardPage extends Component {
     }
   }
 
-  async confirmDelete(wallet) {
+  confirmDelete = async (wallet) => {
     try {
       const name = prompt("Please enter the name of the wallet you want to delete");
       if (name.toLowerCase() === wallet.category.toLowerCase()) {
@@ -309,7 +308,7 @@ class DashboardPage extends Component {
     }
   }
 
-  getWalletBalance(wallet) {
+  getWalletBalance = (wallet) => {
     let delta = 0;
     this.state.transactions.forEach(transaction => {
       if (transaction.wallet_id && transaction.wallet_id._id === wallet._id) {
@@ -319,7 +318,7 @@ class DashboardPage extends Component {
     return (this.state.generalIncome * (wallet.percentage / 100) + delta).toFixed(2);
   }
 
-  walletModal() {
+  walletModal = () => {
     return (
       <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
         <ModalHeader toggle={this.toggle}>
@@ -382,7 +381,7 @@ class DashboardPage extends Component {
     );
   }
 
-  moneyModal() {
+  moneyModal = () => {
     return (
       <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
         <ModalHeader toggle={this.toggle}>
