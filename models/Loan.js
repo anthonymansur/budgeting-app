@@ -3,15 +3,14 @@ const { Schema } = mongoose;
 
 const loanSchema = new Schema({
   amount: Number,
-  loan_recipient: String,
-  loan_donor: String,
+  recipient: String,
+  donor: String,
   type: {
     type: String,
     enum: ['donated', 'received']
   },
-  status: {
-    type: String,
-    enum: ["paid", "not_paid", "forgiven"]
+  paid: {
+    type: Boolean
   },
   date: Date,
   description: String,

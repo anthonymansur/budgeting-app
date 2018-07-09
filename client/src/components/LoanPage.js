@@ -14,11 +14,18 @@ import {
   FormGroup,
   Input,
   Label,
-  Form
+  Form,
+  FormFeedback
 } from "reactstrap";
 import axios from "axios";
 import moment from "moment";
 import numeral from "numeral";
+import ToggleButton from "react-toggle-button";
+
+const TIMEZONE = "America/New_York";
+const now = moment()
+  .tz(TIMEZONE)
+  .format("YYYY-MM-DD");
 
 export default class LoanPage extends React.Component {
   constructor() {
@@ -27,8 +34,15 @@ export default class LoanPage extends React.Component {
       loans: [],
       modal: false,
       modalType: "",
+      modalAmount: 0,
+      modalAmountError: false,
+      modalPerson: "",
+      modalPersonError: false,
+      modalDate: now,
+      modalPerson: "",
       startDate: null,
-      endDate: null
+      endDate: null,
+      modalValue: null
     };
   }
 
@@ -54,7 +68,7 @@ export default class LoanPage extends React.Component {
 
   onClick = type => {
     this.setState({
-      modalType: type
+      modalType: type,
     });
     this.toggle();
   };
@@ -66,15 +80,146 @@ export default class LoanPage extends React.Component {
         if (
           (!this.state.startDate ||
             moment(loan.date).isSameOrAfter(moment(this.state.startDate))) &&
-          (!this.state.endDate ||
-            moment(loan.date).isSameOrBefore(moment(this.state.endDate)))
+          (!this.state.endDate || moment(loan.date).isSameOrBefore(moment(this.state.endDate)))
         ) {
           amount += loan.amount;
         }
       }
     });
     return amount;
-  }
+  };
+
+  onChange = e => {
+    if (e.target.name === "amount") {
+      this.setState({ modalAmount: e.target.value });
+    } else if (e.target.name === "person") {
+      this.setState({ modalPerson: e.target.value.substring(0, 21) });
+    } else if (e.target.name === "date") {
+      this.setState({ modalDate: e.target.value });
+    } else if (e.target.name === "description") {
+      this.setState({ modalDescription: e.target.value.substring(0, 26) });
+    }
+  };
+
+  errorCheck = () => {
+    let valid = true;
+    if (this.state.modalAmount <= 0) {
+      valid = false;
+      this.setState({ modalAmountError: true });
+    } else {
+      this.setState({ modalAmountError: false });
+    }
+    if (this.state.modalPerson === "") {
+      valid = false;
+      this.setState({ modalPersonError: true });
+    } else {
+      this.setState({ modalPersonError: false });
+    }
+    return valid;
+  };
+
+  refreshState = () => {
+    this.setState({
+      modalType: "",
+      modalAmount: 0,
+      modalAmountError: false,
+      modalPerson: "",
+      modalPersonError: false,
+      modalDate: now,
+      modalPerson: ""
+    });
+  };
+
+  onSubmit = async () => {
+    if (this.errorCheck()) {
+      const body = {
+        type: this.state.modalType,
+        amount: this.state.modalAmount,
+        description: this.state.modalDescription,
+        recipient: this.state.modalType === "donated" ? this.state.modalPerson : null,
+        donor: this.state.modalType === "received" ? this.state.modalPerson : null,
+        date: this.state.modalDate
+      };
+      try {
+        const res = await axios.post("/api/loans", body);
+        if (res.data.success) {
+          this.refreshState();
+          await this.componentDidMount();
+        } else {
+          alert(res.data.message);
+        }
+      } catch (e) {
+        alert(e.message);
+      }
+      this.setState({ modal: false });
+    }
+  };
+
+  addLoanModal = () => {
+    return (
+      <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
+        <ModalHeader toggle={this.toggle}>
+          {this.state.modalType === "donated"
+            ? "Record a loan you lent"
+            : "Record a loan you received"}
+        </ModalHeader>
+        <ModalBody>
+          <Form>
+            <FormGroup>
+              <Label>Amount</Label>
+              <Input
+                invalid={this.state.modalAmountError}
+                type="number"
+                name="amount"
+                value={this.state.modalAmount}
+                onChange={this.onChange}
+              />
+              <FormFeedback>Please provide a positive amount</FormFeedback>
+            </FormGroup>
+            <FormGroup>
+              <Label>{this.state.modalType === "donated" ? "Recipient" : "Lender"}</Label>
+              <Input
+                invalid={this.state.modalPersonError}
+                type="text"
+                name="person"
+                value={this.state.modalPerson}
+                onChange={this.onChange}
+              />
+              <FormFeedback>
+                Please provide a {this.state.modalType === "donated" ? "recipient" : "lender"}
+              </FormFeedback>
+            </FormGroup>
+            <FormGroup>
+              <Label>Date</Label>
+              <Input
+                type="date"
+                name="date"
+                value={this.state.modalDate}
+                onChange={this.onChange}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label>Description</Label>
+              <Input
+                type="String"
+                name="description"
+                value={this.state.modalDescription}
+                onChange={this.onChange}
+              />
+            </FormGroup>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={this.onSubmit}>
+            Add Loan
+          </Button>{" "}
+          <Button color="secondary" onClick={this.toggle}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+    );
+  };
 
   render() {
     return (
@@ -89,7 +234,7 @@ export default class LoanPage extends React.Component {
                   <h1>Owed To You</h1>
                 </div>
                 <div className="col-auto">
-                  {numeral(this.getAmount("donated")).format("$0,0.00")}
+                  <strong>{numeral(this.getAmount("donated")).format("$0,0.00")}</strong>
                 </div>
               </Row>
             </CardTitle>
@@ -103,14 +248,20 @@ export default class LoanPage extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {
-                  // <tr>
-                  //   <th scope="row">1</th>
-                  //   <td>Mark</td>
-                  //   <td>Otto</td>
-                  //   <td>@mdo</td>
-                  // </tr>
-                }
+                {this.state.loans.map(loan => {
+                  return (
+                    <tr className={loan.status ? "text-muted" : ""}>
+                      <th scope="row">{numeral(loan.amount).format("$0,0.00")}</th>
+                      <td>{loan.recipient}</td>
+                      <td>
+                        {moment(loan.date)
+                          .utc()
+                          .format("MMMM DD, YYYY")}
+                      </td>
+                      <td>{loan.description}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </Table>
           </CardBody>
@@ -118,43 +269,7 @@ export default class LoanPage extends React.Component {
         <Button color={"success"} block={true} onClick={() => this.onClick("donated")}>
           Add new loan
         </Button>
-        <div>
-          <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-            <ModalHeader toggle={this.toggle}>
-              {this.state.modalType === "donated"
-                ? "Record a loan you lent"
-                : "Record a loan you received"}
-            </ModalHeader>
-            <ModalBody>
-              <Form>
-                <FormGroup>
-                  <Label>Amount</Label>
-                  <Input type="number" />
-                </FormGroup>
-                <FormGroup>
-                  <Label>{this.state.modalType === "donated" ? "Recipient" : "Lender"}</Label>
-                  <Input type="text" />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Date</Label>
-                  <Input type="date" />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Description</Label>
-                  <Input type="String" />
-                </FormGroup>
-              </Form>
-            </ModalBody>
-            <ModalFooter>
-              <Button color="primary" onClick={this.toggle}>
-                Add Loan
-              </Button>{" "}
-              <Button color="secondary" onClick={this.toggle}>
-                Cancel
-              </Button>
-            </ModalFooter>
-          </Modal>
-        </div>
+        <div>{this.addLoanModal()}</div>
       </Container>
     );
   }

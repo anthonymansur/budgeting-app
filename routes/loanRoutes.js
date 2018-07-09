@@ -8,7 +8,7 @@ const TIMEZONE = "America/New_York";
 module.exports = app => {
   app.get("/api/loans", async (req, res) => {
     try {
-      const loans = await Loans.find({ user_id: req.user.id });
+      const loans = await Loan.find({ user_id: req.user.id });
       res.json({
         success: true,
         items: [loans]
@@ -26,8 +26,11 @@ module.exports = app => {
       type: req.body.type,
       description: req.body.description,
       amount: req.body.amount,
+      recipient: req.body.recipient,
+      donor: req.body.donor,
       user_id: req.user.id,
       date: moment(req.body.date).toDate(),
+      paid: false
     };
     const loan = new Loan(params);
     try {
@@ -50,7 +53,7 @@ module.exports = app => {
       date: req.body.date,
     };
     try {
-      await Loans.findByIdAndUpdate(req.body.loan_id, params);
+      await Loan.findByIdAndUpdate(req.body.loan_id, params);
       res.json({
         success: true
       });

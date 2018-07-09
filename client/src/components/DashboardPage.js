@@ -168,7 +168,6 @@ class DashboardPage extends Component {
         this.setState({ modalCategoryError: false });
       }
     }
-    console.log(valid);
     return valid;
   };
 
