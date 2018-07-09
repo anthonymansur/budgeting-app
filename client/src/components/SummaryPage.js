@@ -41,6 +41,7 @@ export default class SummaryPage extends React.Component {
       const wRes = await axios.get("/api/wallets");
       if (wRes.data.success) {
         this.setState({ wallets: wRes.data.items[0] });
+        alert("This page is still under construction.");
       } else {
         throw new Error(wRes.data.message);
       }

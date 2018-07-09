@@ -143,15 +143,15 @@ export default class Expenses extends React.Component {
                         <td>deleted</td>
                       )}
                       <td>
-                        {window.innerWidth < 400
+                      {transaction.description
+                        ? window.innerWidth < 400
                           ? window.innerWidth < 350
-                            ? transaction.description
-                              ? transaction.description.length > 6
-                                ? `${transaction.description.substring(0, 7)}.`
-                                : `${transaction.description.substring(0, 7)}`
-                              : transaction.description ||"none"
-                            : `${transaction.description.substring(0, 10)}`
-                          : transaction.description || "None"}
+                            ? transaction.description.length > 6
+                              ? `${transaction.description.substring(0, 7)}.`
+                              : `${transaction.description.substring(0, 7)}`
+                            : transaction.description.substring(0, 10)
+                          : transaction.description
+                        : "None"}
                       </td>
                     </tr>
                   );
