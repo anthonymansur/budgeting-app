@@ -214,9 +214,9 @@ export default class TransactionPage extends React.Component {
                   return (
                     transaction.type === type &&
                     (!this.state.startDate ||
-                      moment(transaction.date).isSameOrAfter(moment(this.state.startDate))) &&
+                      moment(transaction.date).dayOfYear()>=(moment(this.state.startDate).dayOfYear())) &&
                     (!this.state.endDate ||
-                      moment(transaction.date).isSameOrBefore(moment(this.state.endDate)))
+                      moment(transaction.date).dayOfYear()<=(moment(this.state.endDate).dayOfYear()))
                   );
                 })
                 .sort((a, b) => {

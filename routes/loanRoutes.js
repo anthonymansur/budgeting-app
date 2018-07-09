@@ -51,6 +51,9 @@ module.exports = app => {
       description: req.body.description,
       amount: req.body.amount,
       date: req.body.date,
+      paid: req.body.paid,
+      recipient: req.body.recipient,
+      donor: req.body.donor
     };
     try {
       await Loan.findByIdAndUpdate(req.body.loan_id, params);
