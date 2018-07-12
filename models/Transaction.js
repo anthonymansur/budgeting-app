@@ -12,6 +12,10 @@ const transactionSchema = new Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Wallet"
   },
+  user_id: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User"
+  },
   type: {
     type: String,
     enum: ['add', 'remove']
@@ -23,10 +27,12 @@ const transactionSchema = new Schema({
     type: Boolean,
     default: true
   },
-  user_id:{
-    type: mongoose.Schema.ObjectId,
-    ref: "User"
+  transaction_id: String,
+  status: {
+    type: String,
+    enum: ["accepted", "declined", "pending"]
   }
+
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

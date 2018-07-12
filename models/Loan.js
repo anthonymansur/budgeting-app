@@ -14,10 +14,10 @@ const loanSchema = new Schema({
   },
   date: Date,
   description: String,
-  user_id:{
+  user_id: {
     type: mongoose.Schema.ObjectId,
     ref: "User"
-  } 
+  }
 });
 
 module.exports = mongoose.model('Loan', loanSchema);

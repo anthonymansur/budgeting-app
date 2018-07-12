@@ -20,6 +20,7 @@ import {
   CardTitle,
   Jumbotron
 } from "reactstrap";
+import PlaidLink from "./PlaidLink";
 import axios from "axios";
 import moment from "moment-timezone";
 import numeral from "numeral";
@@ -53,6 +54,7 @@ class DashboardPage extends Component {
       expenses: 0,
       transactions: [],
       wallets: [],
+      items: [],
       remainingPercentage: 100
     };
     this._ismounted = false;
@@ -61,7 +63,6 @@ class DashboardPage extends Component {
   async componentDidMount() {
     this._ismounted = true;
     try {
-      const errorMessage = "";
       const walletResponse = await axios.get("/api/wallets");
       if (walletResponse.data.success) {
         const wallets = walletResponse.data.items[0];
@@ -71,31 +72,36 @@ class DashboardPage extends Component {
         });
         this.setState({ wallets, remainingPercentage });
       } else {
-        errorMessage.concat(walletResponse.data.message);
+        throw new Error(walletResponse.data.message);
       }
+
       const transactionResponse = await axios.get("/api/transactions");
       if (transactionResponse.data.success) {
         this.setState({ transactions: transactionResponse.data.items[0] });
       } else {
-        errorMessage.concat(transactionResponse.data.message);
+        throw new Error(transactionResponse.data.message);
       }
-      if (errorMessage) {
-        alert(errorMessage);
+
+      const itemResponse = await axios.get("/api/items");
+      if (itemResponse.data.success) {
+        this.setState({ items: itemResponse.data.items[0] });
       } else {
-        let income = 0;
-        let generalIncome = 0;
-        let expenses = 0;
-        this.state.transactions.forEach(transaction => {
-          if (transaction.type === "add") {
-            transaction.wallet_id
-              ? (income += transaction.amount)
-              : (generalIncome += transaction.amount);
-          } else if (transaction.type === "remove") {
-            expenses += transaction.amount;
-          }
-        });
-        this.setState({ income, generalIncome, expenses });
+        throw new Error(itemResponse.data.message);
       }
+
+      let income = 0;
+      let generalIncome = 0;
+      let expenses = 0;
+      this.state.transactions.forEach(transaction => {
+        if (transaction.type === "add") {
+          transaction.wallet_id
+            ? (income += transaction.amount)
+            : (generalIncome += transaction.amount);
+        } else if (transaction.type === "remove") {
+          expenses += transaction.amount;
+        }
+      });
+      this.setState({ income, generalIncome, expenses });
     } catch (e) {
       alert(e.message);
     }
@@ -553,7 +559,6 @@ class DashboardPage extends Component {
                     </strong>
                   </div>
                 </Row>
-                <div className="balance-space" />
                 {this.state.wallets.map(wallet => {
                   return (
                     <div key={wallet._id}>
@@ -575,14 +580,21 @@ class DashboardPage extends Component {
                     </div>
                   );
                 })}
-                <Button
-                  className="text-right"
-                  style={{ float: "right", marginTop: "-20px" }}
-                  color="link"
-                  onClick={this.addWalletToggle}
-                >
-                  Add New Wallet
-                </Button>
+                <Row style={{ marginTop: "-20px" }}>
+                  <div className="col-auto mr-auto">
+                    <PlaidLink items={this.state.items}/>
+                  </div>
+                  <div className="col-auto">
+                    <Button
+                      className="text-right"
+                      color="link"
+                      onClick={this.addWalletToggle}
+                      style={{ padding: "0" }}
+                    >
+                      Add New Wallet
+                    </Button>
+                  </div>
+                </Row>
                 <br />
                 <Row>
                   <Col xs="6">
@@ -637,6 +649,7 @@ class DashboardPage extends Component {
           <Col md="3" />
         </Row>
         {this.state.modalType.slice(-5) === "money" ? this.moneyModal() : this.walletModal()}
+        <br />
       </Container>
     );
   }

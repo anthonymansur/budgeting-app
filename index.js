@@ -21,10 +21,16 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+//routes
 require("./routes/authRoutes")(app);
 require("./routes/walletRoutes")(app);
 require("./routes/transactionRoutes")(app);
 require("./routes/loanRoutes")(app);
+require("./routes/plaidRoutes")(app);
+require("./routes/itemRoutes")(app);
+
+//crons
+require(`${__dirname}/crons/transactions`);
 
 if (process.env.NODE_ENV === 'production') {
   // Express will serve up production assets
