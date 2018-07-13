@@ -34,7 +34,7 @@ const TransactionsFn = async () => {
         offset: 0
       });
       const transactions = transactionsResponse.transactions;
-      console.log(transactionsResponse.transactions);
+      // console.log(transactionsResponse.transactions);
       transactions.forEach(async transaction => {
         const existingTransaction = await Transaction.findOne({ transaction_id: transaction.transaction_id });
         if (!existingTransaction) {
