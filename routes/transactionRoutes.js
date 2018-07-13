@@ -9,7 +9,7 @@ module.exports = app => {
   app.get("/api/transactions", async (req, res) => {
     try {
       const transactions = await Transaction.find({ user_id: req.user.id }).populate("wallet_id");
-      const trans = transactions.filter(t => { return !t.status || t.status === "accepted" })
+      const trans = transactions.filter(t => { return req.query.show_all || !t.status || t.status === "accepted" })
       res.json({
         success: true,
         items: [transactions]
@@ -47,13 +47,14 @@ module.exports = app => {
   });
 
   app.put("/api/transactions", async (req, res) => {
-    const params = {
-      description: req.body.description,
-      amount: req.body.amount,
-      date: req.body.date,
-      wallet_id: req.body.wallet_id || null,
-      taxable: req.body.taxable
-    };
+    const params = {};
+    req.body.description && (params.description = req.body.description);
+    req.body.amount && (params.amount = req.body.amount);
+    req.body.date && (params.date = req.body.date);
+    req.body.wallet_id && (params.wallet_id = req.body.wallet_id);
+    req.body.taxable && (params.taxable = req.body.taxable);
+    req.body.status && (params.status = req.body.status);
+    console.log(params);
     try {
       await Transaction.findByIdAndUpdate(req.body.transaction_id, params);
       res.json({

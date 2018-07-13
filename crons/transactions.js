@@ -10,6 +10,7 @@ const { plaidClientId, plaidSecret, plaidPublicKey } = require("../config/keys")
 
 const EVERY_MINUTE = "* * * * *";
 const TIMEZONE = "America/New_York";
+const now = moment().tz(TIMEZONE);
 const client = new plaid.Client(
   plaidClientId,
   plaidSecret,
@@ -20,11 +21,12 @@ const client = new plaid.Client(
 
 const TransactionsFn = async () => {
   try {
+    console.log(`Checking incoming transactions at ${now.toISOString()}`)
     const items = await Item.find();
     items.forEach(async item => {
       const access_token = item.access_token;
       const startDate = moment().tz(TIMEZONE)
-        //.subtract(2, "days")
+        .subtract(1, "days")
         .format("YYYY-MM-DD");
       const endDate = moment().tz(TIMEZONE).format("YYYY-MM-DD");
       const transactionsResponse = await client.getTransactions(access_token, startDate, endDate, {
@@ -32,6 +34,7 @@ const TransactionsFn = async () => {
         offset: 0
       });
       const transactions = transactionsResponse.transactions;
+      console.log(transactionsResponse.transactions);
       transactions.forEach(async transaction => {
         const existingTransaction = await Transaction.findOne({ transaction_id: transaction.transaction_id });
         if (!existingTransaction) {

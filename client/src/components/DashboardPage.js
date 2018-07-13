@@ -13,6 +13,8 @@ import {
   Input,
   InputGroup,
   InputGroupAddon,
+  ListGroup,
+  ListGroupItem,
   Row,
   Col,
   Card,
@@ -30,6 +32,8 @@ const TIMEZONE = "America/New_York";
 const now = moment()
   .tz(TIMEZONE)
   .format("YYYY-MM-DD");
+
+const wait = ms => new Promise((r, j) => setTimeout(r, ms));
 
 class DashboardPage extends Component {
   constructor(props) {
@@ -53,9 +57,11 @@ class DashboardPage extends Component {
       generalIncome: 0,
       expenses: 0,
       transactions: [],
+      newTransactions: [],
       wallets: [],
       items: [],
-      remainingPercentage: 100
+      remainingPercentage: 100,
+      expandTransaction: {}
     };
     this._ismounted = false;
   }
@@ -75,12 +81,29 @@ class DashboardPage extends Component {
         throw new Error(walletResponse.data.message);
       }
 
-      const transactionResponse = await axios.get("/api/transactions");
+      const transactionResponse = await axios.get("/api/transactions?show_all=true");
       if (transactionResponse.data.success) {
-        this.setState({ transactions: transactionResponse.data.items[0] });
+        const newTransactions = transactionResponse.data.items[0].filter(transaction => {
+          return transaction.status && transaction.status === "pending";
+        });
+        this.setState({
+          transactions: transactionResponse.data.items[0].filter(transaction => {
+            return !transaction.status || transaction.status === "accepted";
+          }),
+          newTransactions
+        });
+
+        newTransactions &&
+          (newTransactions.length > 0
+            ? this.setState({ modalType: "new", modal: true })
+            : this.setState({ modalType: "", modal: false }));
+
+        newTransactions[0] && this.expandTransaction(newTransactions[0]);
       } else {
         throw new Error(transactionResponse.data.message);
       }
+
+      this.state.newTransactions;
 
       const itemResponse = await axios.get("/api/items");
       if (itemResponse.data.success) {
@@ -237,7 +260,7 @@ class DashboardPage extends Component {
     });
   };
 
-  editWalletToggle = (wallet) => {
+  editWalletToggle = wallet => {
     this.setState({
       modal: !this.state.modal,
       modalWallet: wallet,
@@ -247,7 +270,7 @@ class DashboardPage extends Component {
       modalPercentageError: false,
       modalType: "edit-wallet"
     });
-  }
+  };
 
   addToWallet = async () => {
     if (this.errorCheck()) {
@@ -268,7 +291,7 @@ class DashboardPage extends Component {
       }
       this.setState({ modal: false });
     }
-  }
+  };
 
   editWallet = async () => {
     if (this.errorCheck()) {
@@ -292,9 +315,9 @@ class DashboardPage extends Component {
       }
       this.setState({ modal: false });
     }
-  }
+  };
 
-  confirmDelete = async (wallet) => {
+  confirmDelete = async wallet => {
     try {
       const name = prompt("Please enter the name of the wallet you want to delete");
       if (name.toLowerCase() === wallet.category.toLowerCase()) {
@@ -312,9 +335,9 @@ class DashboardPage extends Component {
     } catch (e) {
       alert(e.message);
     }
-  }
+  };
 
-  getWalletBalance = (wallet) => {
+  getWalletBalance = wallet => {
     let delta = 0;
     this.state.transactions.forEach(transaction => {
       if (transaction.wallet_id && transaction.wallet_id._id === wallet._id) {
@@ -322,7 +345,50 @@ class DashboardPage extends Component {
       }
     });
     return (this.state.generalIncome * (wallet.percentage / 100) + delta).toFixed(2);
-  }
+  };
+
+  expandTransaction = transaction => {
+    this.setState({
+      expandTransaction: transaction,
+      modalDescription: transaction.description
+    });
+  };
+
+  onEdit = async status => {
+    let valid = true;
+    if (this.state.modalCategory === "" && status !== "denied") {
+      valid = false;
+      this.setState({ modalCategoryError: true });
+    } else {
+      this.setState({ modalCategoryError: false });
+    }
+    if (valid) {
+      let body = {};
+      status === "accepted"
+        ? (body = {
+            transaction_id: this.state.expandTransaction._id,
+            status,
+            description: this.state.modalDescription,
+            wallet_id: this.state.modalCategory,
+            taxable:
+              this.state.expandTransaction.type === "add"
+                ? this.state.modalValue
+                : !this.state.modalValue
+          })
+        : (body = { transaction_id: this.state.expandTransaction._id, status });
+      try {
+        const res = await axios.put("/api/transactions", body);
+        if (res.data.success) {
+          this.setState({ modal: true, modalCategory: "" });
+          await this.componentDidMount();
+        } else {
+          alert(res.data.message);
+        }
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+  };
 
   walletModal = () => {
     return (
@@ -385,7 +451,7 @@ class DashboardPage extends Component {
         </ModalFooter>
       </Modal>
     );
-  }
+  };
 
   moneyModal = () => {
     return (
@@ -536,7 +602,220 @@ class DashboardPage extends Component {
         </ModalFooter>
       </Modal>
     );
-  }
+  };
+
+  transactionModal = () => {
+    return (
+      <Modal isOpen={this.state.modal}>
+        <ModalHeader>
+          <h1>Transfer new transactions</h1>
+        </ModalHeader>
+        <ModalBody>
+          {this.state.newTransactions.filter(trans => {
+            return trans.type === "add";
+          }).length > 0 ? (
+            <h2>Income</h2>
+          ) : (
+            ""
+          )}
+          <ListGroup>
+            {this.state.newTransactions
+              .filter(trans => {
+                return trans.type === "add";
+              })
+              .map(transaction => {
+                return (
+                  <ListGroupItem
+                    key={transaction._id}
+                    onClick={() => this.expandTransaction(transaction)}
+                  >
+                    <p>
+                      Amount:
+                      {" $" + -transaction.amount}
+                    </p>
+                    <p>
+                      Date:
+                      {" " + moment(transaction.date).format("MMMM DD, YYYY")}
+                    </p>
+                    {this.state.expandTransaction._id === transaction._id ? (
+                      <Form>
+                        <FormGroup>
+                          <Label for="category">Category</Label>
+                          <Input
+                            type="select"
+                            valid={!this.state.modalCategoryError}
+                            invalid={this.state.modalCategoryError}
+                            name="category"
+                            id="category"
+                            value={this.state.modalCategory}
+                            onChange={this.onChange}
+                          >
+                            <option value="none">Select a category</option>
+                            {this.state.wallets.map(wallet => {
+                              return (
+                                <option key={wallet._id} value={wallet._id}>
+                                  {wallet.category}
+                                </option>
+                              );
+                            })}
+                          </Input>
+                          <FormFeedback valid>Please choose a category</FormFeedback>
+                          <FormFeedback>Please choose a category</FormFeedback>
+                        </FormGroup>
+                        <FormGroup>
+                          <Label for="tax">Taxable</Label>
+                          <ToggleButton
+                            inactiveLabel={
+                              <i className="material-icons" style={{ fontSize: "2rem" }}>
+                                close
+                              </i>
+                            }
+                            activeLabel={
+                              <i className="material-icons" style={{ fontSize: "2rem" }}>
+                                check
+                              </i>
+                            }
+                            value={this.state.modalValue}
+                            onToggle={value => {
+                              this.setState({
+                                modalValue: !value
+                              });
+                            }}
+                          />
+                        </FormGroup>
+                        <FormGroup>
+                          <Label>Description:</Label>
+                          <Input
+                            type="text"
+                            name="description"
+                            value={this.state.modalDescription}
+                            onChange={this.onChange}
+                          />
+                        </FormGroup>
+                        <FormGroup style={{ display: "flex", justifyContent: "space-between" }}>
+                          <Button color="danger" onClick={() => this.onEdit("denied")}>
+                            Discard
+                          </Button>
+                          <Button color="success" onClick={() => this.onEdit("accepted")}>
+                            Accept Transaction
+                          </Button>
+                        </FormGroup>
+                      </Form>
+                    ) : (
+                      <p>
+                        Description:
+                        {" " + transaction.description}
+                      </p>
+                    )}
+                  </ListGroupItem>
+                );
+              })}
+          </ListGroup>
+
+          {this.state.newTransactions.filter(trans => {
+            return trans.type === "remove";
+          }).length > 0 ? (
+            <h2>Expenses</h2>
+          ) : (
+            ""
+          )}
+          <ListGroup>
+            {this.state.newTransactions
+              .filter(trans => {
+                return trans.type === "remove";
+              })
+              .map(transaction => {
+                return (
+                  <ListGroupItem
+                    key={transaction._id}
+                    onClick={() => this.expandTransaction(transaction)}
+                  >
+                    <p>
+                      Amount:
+                      {" $" + transaction.amount}
+                    </p>
+                    <p>
+                      Date:
+                      {" " + moment(transaction.date).format("MMMM DD, YYYY")}
+                    </p>
+                    {this.state.expandTransaction._id === transaction._id ? (
+                      <Form>
+                        <FormGroup>
+                          <Label for="category">Category</Label>
+                          <Input
+                            type="select"
+                            valid={!this.state.modalCategoryError}
+                            invalid={this.state.modalCategoryError}
+                            name="category"
+                            id="category"
+                            value={this.state.modalCategory}
+                            onChange={this.onChange}
+                          >
+                            <option value="none">Select a category</option>
+                            {this.state.wallets.map(wallet => {
+                              return (
+                                <option key={wallet._id} value={wallet._id}>
+                                  {wallet.category}
+                                </option>
+                              );
+                            })}
+                          </Input>
+                          <FormFeedback valid>Please choose a category</FormFeedback>
+                          <FormFeedback>Please choose a category</FormFeedback>
+                        </FormGroup>
+                        <FormGroup>
+                          <Label for="tax">Tax Deductible</Label>
+                          <ToggleButton
+                            inactiveLabel={
+                              <i className="material-icons" style={{ fontSize: "2rem" }}>
+                                close
+                              </i>
+                            }
+                            activeLabel={
+                              <i className="material-icons" style={{ fontSize: "2rem" }}>
+                                check
+                              </i>
+                            }
+                            value={this.state.modalValue}
+                            onToggle={value => {
+                              this.setState({
+                                modalValue: !value
+                              });
+                            }}
+                          />
+                        </FormGroup>
+                        <FormGroup>
+                          <Label>Description:</Label>
+                          <Input
+                            type="text"
+                            name="description"
+                            value={this.state.modalDescription}
+                            onChange={this.onChange}
+                          />
+                        </FormGroup>
+                        <FormGroup style={{ display: "flex", justifyContent: "space-between" }}>
+                          <Button color="danger" onClick={() => this.onEdit("denied")}>
+                            Discard
+                          </Button>
+                          <Button color="success" onClick={() => this.onEdit("accepted")}>
+                            Accept Transaction
+                          </Button>
+                        </FormGroup>
+                      </Form>
+                    ) : (
+                      <p>
+                        Description:
+                        {" " + transaction.description}
+                      </p>
+                    )}
+                  </ListGroupItem>
+                );
+              })}
+          </ListGroup>
+        </ModalBody>
+      </Modal>
+    );
+  };
 
   render() {
     return (
@@ -582,7 +861,7 @@ class DashboardPage extends Component {
                 })}
                 <Row style={{ marginTop: "-20px" }}>
                   <div className="col-auto mr-auto">
-                    <PlaidLink items={this.state.items}/>
+                    <PlaidLink items={this.state.items} />
                   </div>
                   <div className="col-auto">
                     <Button
@@ -648,7 +927,11 @@ class DashboardPage extends Component {
           </Col>
           <Col md="3" />
         </Row>
-        {this.state.modalType.slice(-5) === "money" ? this.moneyModal() : this.walletModal()}
+        {this.state.modalType.slice(-5) === "money"
+          ? this.moneyModal()
+          : this.state.modalType.slice(-6) === "wallet"
+            ? this.walletModal()
+            : this.transactionModal()}
         <br />
       </Container>
     );
