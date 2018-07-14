@@ -823,6 +823,15 @@ class DashboardPage extends Component {
         <Row>
           <Col md="3" />
           <Col md="6">
+            {
+              this.state.items.filter(item => {return item.update_required}).length > 0 ? (
+                this.state.items.filter(item => {return item.update_required}).map(item => {
+                  return (
+                    <PlaidLink token={item.public_token.public_token} id={item._id} title={`Update ${item.metadata.institution.name} required`}/>
+                  )
+                })
+              ) : ("")
+            }
             {this.state.wallets.length > 0 ? (
               <div>
                 <br />

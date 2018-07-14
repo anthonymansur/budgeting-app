@@ -8,6 +8,18 @@ const itemSchema = new Schema({
   user_id: {
     type: mongoose.Schema.ObjectId,
     ref: "User"
+  },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  update_required: {
+    type: Boolean,
+    default: false
+  },
+  public_token: {
+    type: Object,
+    default: null
   }
 });
 

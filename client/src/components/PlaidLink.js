@@ -7,25 +7,40 @@ export default class extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: props.items || null
+      items: props.items || null,
+      token: props.token || null,
+      title: props.title || null,
+      id: props.id || null
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ items: nextProps.items || null });
+    this.setState({ items: nextProps.items || null, token: nextProps.token || null, title: nextProps.title || null, id: nextProps.id || null });
   }
 
   handleOnSuccess = async (public_token, metadata) => {
     try {
-      const res = await axios.post("/api/plaid/get_access_token", { public_token, metadata });
-      if (res.data.success) {
-        console.log("success");
+      if (this.state.token){
+        const body = {
+          active: true,
+          update_required: false,
+          public_token: null
+        }
+        const res = await axios.put("/api/item", body);
+        if (!res.data.success) {
+          alert(res.data.message);
+        }
       } else {
-        throw new Error(res.data.message);
+        const res = await axios.post("/api/plaid/get_access_token", { public_token, metadata });
+        if (res.data.success) {
+          console.log("success");
+        } else {
+          throw new Error(res.data.message);
+        }
       }
     } catch(e) {
       console.log(e);
-      alert(e.error_message);
+      alert(e.error_message || e.message);
     }
   }
   handleOnExit = () => {
@@ -34,8 +49,7 @@ export default class extends Component {
   handleOnEvent = async (eventName, metadata) => {
     if (eventName === "SELECT_INSTITUTION") {
         let isUnique = true;
-        console.log(this.state.items);
-        this.state.items.forEach(item => {
+        this.state.items && this.state.items.forEach(item => {
           if (item.metadata.institution.institution_id === metadata.institution_id) {
             isUnique = false;
           }
@@ -50,18 +64,18 @@ export default class extends Component {
   render() {
     return (
       <PlaidLink
-          ref="link"
         clientName="Budgeting App"
         env="development"
         product={["transactions"]}
         publicKey="6b29161947afcd04a40ebc0f9092a7"
+        token = {this.state.token}
         onExit={this.handleOnExit}
         onEvent={this.handleOnEvent}
         onSuccess={this.handleOnSuccess}
         className="btn btn-link"
         style={{ padding: "0", background:"none", border: "none" }}
         >
-        Link your accounts
+        { this.state.title || "Link your accounts" }
       </PlaidLink>
     )
   }

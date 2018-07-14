@@ -31,6 +31,7 @@ require("./routes/itemRoutes")(app);
 
 //crons
 require(`${__dirname}/crons/transactions`);
+require(`${__dirname}/crons/update`);
 
 if (process.env.NODE_ENV === 'production') {
   // Express will serve up production assets
