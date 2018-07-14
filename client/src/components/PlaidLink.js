@@ -33,7 +33,7 @@ export default class extends Component {
       } else {
         const res = await axios.post("/api/plaid/get_access_token", { public_token, metadata });
         if (res.data.success) {
-          console.log("success");
+          window.location.reload();
         } else {
           throw new Error(res.data.message);
         }
