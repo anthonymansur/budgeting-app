@@ -8,7 +8,7 @@ const TIMEZONE = "America/New_York";
 module.exports = app => {
   app.get("/api/transactions", async (req, res) => {
     try {
-      const transactions = await Transaction.find({ user_id: req.user.id }).populate("wallet_id").filter(t => { return req.query.show_all || !t.status || t.status === "accepted" })
+      const transactions = await Transaction.find({ user_id: req.user.id }).populate("wallet_id");
       const trans = transactions.filter(t => { return req.query.show_all || !t.status || t.status === "accepted" })
       res.json({
         success: true,
