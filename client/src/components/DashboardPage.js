@@ -83,14 +83,30 @@ class DashboardPage extends Component {
 
       const transactionResponse = await axios.get("/api/transactions?show_all=true");
       if (transactionResponse.data.success) {
+        const transactions = transactionResponse.data.items[0].filter(transaction => {
+          return !transaction.status || transaction.status === "accepted";
+        });
         const newTransactions = transactionResponse.data.items[0].filter(transaction => {
           return transaction.status && transaction.status === "pending";
         });
+        let income = 0;
+        let generalIncome = 0;
+        let expenses = 0;
+        transactions.forEach(transaction => {
+          if (transaction.type === "add") {
+            transaction.wallet_id
+              ? (income += transaction.amount)
+              : (generalIncome += transaction.amount);
+          } else if (transaction.type === "remove") {
+            expenses += transaction.amount;
+          }
+        });
         this.setState({
-          transactions: transactionResponse.data.items[0].filter(transaction => {
-            return !transaction.status || transaction.status === "accepted";
-          }),
-          newTransactions
+          transactions,
+          newTransactions,
+          income,
+          generalIncome,
+          expenses
         });
 
         newTransactions &&
@@ -103,28 +119,12 @@ class DashboardPage extends Component {
         throw new Error(transactionResponse.data.message);
       }
 
-      this.state.newTransactions;
-
       const itemResponse = await axios.get("/api/items");
       if (itemResponse.data.success) {
         this.setState({ items: itemResponse.data.items[0] });
       } else {
         throw new Error(itemResponse.data.message);
       }
-
-      let income = 0;
-      let generalIncome = 0;
-      let expenses = 0;
-      this.state.transactions.forEach(transaction => {
-        if (transaction.type === "add") {
-          transaction.wallet_id
-            ? (income += transaction.amount)
-            : (generalIncome += transaction.amount);
-        } else if (transaction.type === "remove") {
-          expenses += transaction.amount;
-        }
-      });
-      this.setState({ income, generalIncome, expenses });
     } catch (e) {
       alert(e.message);
     }
@@ -823,15 +823,23 @@ class DashboardPage extends Component {
         <Row>
           <Col md="3" />
           <Col md="6">
-            {
-              this.state.items.filter(item => {return item.update_required}).length > 0 ? (
-                this.state.items.filter(item => {return item.update_required}).map(item => {
-                  return (
-                    <PlaidLink token={item.public_token.public_token} id={item._id} title={`Update ${item.metadata.institution.name} required`}/>
-                  )
-                })
-              ) : ("")
-            }
+            {this.state.items.filter(item => {
+              return item.update_required;
+            }).length > 0
+              ? this.state.items
+                  .filter(item => {
+                    return item.update_required;
+                  })
+                  .map(item => {
+                    return (
+                      <PlaidLink
+                        token={item.public_token.public_token}
+                        id={item._id}
+                        title={`Update ${item.metadata.institution.name} required`}
+                      />
+                    );
+                  })
+              : ""}
             {this.state.wallets.length > 0 ? (
               <div>
                 <br />

@@ -26,8 +26,7 @@ const TransactionsFn = async () => {
     items.forEach(async item => {
       try {
         const access_token = item.access_token;
-        const startDate = moment()
-          .tz(TIMEZONE)
+        const startDate = now
           .subtract(5, "days")
           .format("YYYY-MM-DD");
         const endDate = now
