@@ -50,7 +50,7 @@ const TransactionsFn = async () => {
               const trans = await new Transaction({
                 user_id: item.user_id,
                 wallet_id: null,
-                amount: transaction.amount,
+                amount: transaction.amount > 0 ? transaction.amount : -transaction.amount,
                 type: transaction.amount > 0 ? "remove" : "add",
                 description: transaction.name.substring(0, 26),
                 date: transaction.date,

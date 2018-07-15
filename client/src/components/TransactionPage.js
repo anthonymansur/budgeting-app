@@ -88,7 +88,6 @@ export default class TransactionPage extends React.Component {
   }
 
   editToggle = (transaction) => {
-    console.log(transaction.taxable);
     this.setState({
       modalTransaction: transaction,
       modal: !this.state.modal,
@@ -108,13 +107,6 @@ export default class TransactionPage extends React.Component {
             ? !transaction.taxable
             : false
     });
-    console.log(transaction.type === "add"
-    ? transaction.taxable
-      ? transaction.taxable
-      : true
-    : transaction.taxable
-      ? !transaction.taxable
-      : false);
   }
 
   onChange = (event) => {

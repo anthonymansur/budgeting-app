@@ -54,7 +54,6 @@ module.exports = app => {
     req.body.wallet_id && (params.wallet_id = req.body.wallet_id);
     req.body.taxable && (params.taxable = req.body.taxable);
     req.body.status && (params.status = req.body.status);
-    console.log(params);
     try {
       await Transaction.findByIdAndUpdate(req.body.transaction_id, params);
       res.json({
@@ -69,7 +68,6 @@ module.exports = app => {
   });
 
   app.delete("/api/transactions", async (req, res) => {
-    console.log(req.query.id);
     const transactionId = ObjectId(req.query.id);
     try {
       await Transaction.findByIdAndDelete(transactionId);

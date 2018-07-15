@@ -142,7 +142,6 @@ export default class WalletPage extends React.Component {
         moneySpent += transaction.amount;
       }
     });
-    console.log(moneySpent);
     return ((this.state.income * (wallet.percentage/100)) - moneySpent).toFixed(2);
   }
 
@@ -155,7 +154,6 @@ export default class WalletPage extends React.Component {
       };
       try {
         const res = await axios.post("/api/wallets", body);
-        console.log(res.data);
         if (!res.data.success) {
           alert(res.data.message);
         } else {
@@ -179,7 +177,6 @@ export default class WalletPage extends React.Component {
       };
       try {
         const res = await axios.put("/api/wallets", body);
-        console.log(res.data);
         if (!res.data.success) {
           alert(res.data.message);
         } else {

@@ -631,7 +631,7 @@ class DashboardPage extends Component {
                   >
                     <p>
                       Amount:
-                      {" $" + -transaction.amount}
+                      {" $" + transaction.amount}
                     </p>
                     <p>
                       Date:
