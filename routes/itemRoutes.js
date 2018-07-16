@@ -10,6 +10,7 @@ module.exports = app => {
         items: [items]
       });
     } catch (e) {
+      console.log(e);
       res.json({
         success: false,
         message: e.message
@@ -31,6 +32,7 @@ module.exports = app => {
         items: [items]
       });
     } catch (e) {
+      console.log(e);
       res.json({
         success: false,
         message: e.message

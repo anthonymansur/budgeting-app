@@ -15,6 +15,7 @@ module.exports = app => {
         items: [trans]
       });
     } catch (e) {
+      console.log(e);
       res.json({
         success: false,
         message: e.message
@@ -39,6 +40,7 @@ module.exports = app => {
         success: true
       });
     } catch (e) {
+      console.log(e);
       res.json({
         success: false,
         message: e.message
@@ -60,6 +62,7 @@ module.exports = app => {
         success: true
       });
     } catch (e) {
+      console.log(e);
       res.json({
         success: false,
         message: e.message
@@ -75,6 +78,7 @@ module.exports = app => {
         success: true
       });
     } catch (e) {
+      console.log(e);
       res.json({
         success: false,
         message: e.message

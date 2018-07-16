@@ -60,7 +60,8 @@ class DashboardPage extends Component {
       wallets: [],
       items: [],
       remainingPercentage: 100,
-      expandTransaction: {}
+      expandTransaction: {},
+      expandType: ""
     };
     this._ismounted = false;
   }
@@ -108,12 +109,29 @@ class DashboardPage extends Component {
           expenses
         });
 
-        newTransactions &&
-          (newTransactions.length > 0
-            ? this.setState({ modalType: "new", modal: true })
-            : this.setState({ modalType: "", modal: false }));
-
-        newTransactions[0] && this.expandTransaction(newTransactions[0]);
+        if (newTransactions && newTransactions.length > 0) {
+          const newIncomeTransactions = newTransactions.filter(trans => {return trans.type === "add"});
+          const newExpenseTransactions = newTransactions.filter(trans => {return trans.type === "remove"});
+          if (this.state.expandType === "income" || this.state.expandType === "") {
+            if (newIncomeTransactions.length === 0) {
+              this.setState({ modalType: "new", modal: true, expandType: "expense" });
+              this.expandTransaction(newExpenseTransactions[0]);
+            } else {
+              this.setState({ modalType: "new", modal: true, expandType: "income" });
+              this.expandTransaction(newIncomeTransactions[0]);
+            }
+          } else {
+            if (newExpenseTransactions.length === 0) {
+              this.setState({ modalType: "new", modal: true, expandType: "expense" });
+              this.expandTransaction(newIncomeTransactions[0]);
+            } else {
+              this.setState({ modalType: "new", modal: true, expandType: "income" });
+              this.expandTransaction(newExpenseTransactions[0]);
+            }
+          }
+        } else {
+          this.setState({ modalType: "", modal: false, expandType: "" });
+        }
       } else {
         throw new Error(transactionResponse.data.message);
       }
@@ -125,6 +143,7 @@ class DashboardPage extends Component {
         throw new Error(itemResponse.data.message);
       }
     } catch (e) {
+      console.log(e);
       alert(e.message);
     }
   }
@@ -238,6 +257,7 @@ class DashboardPage extends Component {
           alert(res.data.message);
         }
       } catch (e) {
+        console.log(e);
         alert(e.message);
       }
       this.setState({ modal: false });
@@ -279,6 +299,7 @@ class DashboardPage extends Component {
           await this.componentDidMount();
         }
       } catch (e) {
+        console.log(e);
         alert(e.message);
       }
       this.setState({ modal: false });
@@ -303,6 +324,7 @@ class DashboardPage extends Component {
           await this.componentDidMount();
         }
       } catch (e) {
+        console.log(e);
         alert(e.message);
       }
       this.setState({ modal: false });
@@ -325,6 +347,7 @@ class DashboardPage extends Component {
         this.setState({ modal: false });
       }
     } catch (e) {
+      console.log(e);
       alert(e.message);
     }
   };
@@ -377,6 +400,7 @@ class DashboardPage extends Component {
           alert(res.data.message);
         }
       } catch (e) {
+        console.log(e);
         alert(e.message);
       }
     }
@@ -596,8 +620,8 @@ class DashboardPage extends Component {
 
   transactionModal = () => {
     return (
-      <Modal isOpen={this.state.modal}>
-        <ModalHeader>
+      <Modal isOpen={this.state.modal} toggle={this.toggle}>
+        <ModalHeader toggle={this.toggle}>
           <h1>Transfer new transactions</h1>
         </ModalHeader>
         <ModalBody>
@@ -701,6 +725,14 @@ class DashboardPage extends Component {
                 );
               })}
           </ListGroup>
+
+          {this.state.newTransactions.filter(trans => {
+            return trans.type === "add";
+          }).length > 0 ? (
+            <br />
+          ) : (
+            ""
+          )}
 
           {this.state.newTransactions.filter(trans => {
             return trans.type === "remove";
