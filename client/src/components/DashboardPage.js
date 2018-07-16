@@ -51,7 +51,6 @@ class DashboardPage extends Component {
       modalName: "",
       modalNameError: false,
       modalPercentage: 0,
-      modalPercentageError: false,
       modalValue: false,
       income: 0,
       generalIncome: 0,
@@ -177,12 +176,6 @@ class DashboardPage extends Component {
       } else {
         this.setState({ modalNameError: false });
       }
-      if (this.state.modalPercentage === 0) {
-        valid = false;
-        this.setState({ modalPercentageError: true });
-      } else {
-        this.setState({ modalPercentageError: false });
-      }
     } else {
       if (this.state.modalAmount <= 0) {
         valid = false;
@@ -267,7 +260,6 @@ class DashboardPage extends Component {
       modalName: wallet.category,
       modalNameError: false,
       modalPercentage: wallet.percentage,
-      modalPercentageError: false,
       modalType: "edit-wallet"
     });
   };
@@ -412,7 +404,6 @@ class DashboardPage extends Component {
             <FormGroup>
               <Label>Percentage: {this.state.modalPercentage}</Label>
               <Input
-                invalid={this.state.modalPercentageError}
                 type="range"
                 min="0"
                 max={
@@ -424,7 +415,6 @@ class DashboardPage extends Component {
                 name="slider"
                 onChange={this.onChange}
               />
-              <FormFeedback>Cannot add a wallet with percent zero</FormFeedback>
             </FormGroup>
           </Form>
         </ModalBody>
