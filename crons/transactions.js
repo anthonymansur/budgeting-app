@@ -27,7 +27,7 @@ const TransactionsFn = async () => {
       try {
         const access_token = item.access_token;
         const startDate = now
-          .subtract(5, "days")
+          .subtract(30, "days")
           .format("YYYY-MM-DD");
         const endDate = now
           .format("YYYY-MM-DD");
