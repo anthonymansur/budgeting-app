@@ -22,6 +22,7 @@ export default class extends Component {
     try {
       if (this.state.token){
         const body = {
+          id: this.state.id,
           active: true,
           update_required: false,
           public_token: null
