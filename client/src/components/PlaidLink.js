@@ -27,7 +27,7 @@ export default class extends Component {
           update_required: false,
           public_token: null
         }
-        const res = await axios.put("/api/item", body);
+        const res = await axios.put("/api/items", body);
         if (!res.data.success) {
           alert(res.data.message);
         }
