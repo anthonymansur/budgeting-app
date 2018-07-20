@@ -59,14 +59,14 @@ class DashboardPage extends Component {
       newTransactions: [],
       wallets: [],
       items: [],
+      goals: [],
       remainingPercentage: 100,
-      expandTransaction: {}
+      expandTransaction: {},
+      ismounted: false
     };
-    this._ismounted = false;
   }
 
   async componentDidMount() {
-    this._ismounted = true;
     try {
       const walletResponse = await axios.get("/api/wallets");
       if (walletResponse.data.success) {
@@ -79,7 +79,6 @@ class DashboardPage extends Component {
       } else {
         throw new Error(walletResponse.data.message);
       }
-
       const transactionResponse = await axios.get("/api/transactions?show_all=true");
       if (transactionResponse.data.success) {
         const transactions = transactionResponse.data.items[0].filter(transaction => {
@@ -88,25 +87,29 @@ class DashboardPage extends Component {
         const newTransactions = transactionResponse.data.items[0].filter(transaction => {
           return transaction.status && transaction.status === "pending";
         });
-        let income = 0;
-        let generalIncome = 0;
-        let expenses = 0;
-        transactions.forEach(transaction => {
-          if (transaction.type === "add") {
-            transaction.wallet_id
-              ? (income += transaction.amount)
-              : (generalIncome += transaction.amount);
-          } else if (transaction.type === "remove") {
-            expenses += transaction.amount;
-          }
-        });
         this.setState({
           transactions,
-          newTransactions,
-          income,
-          generalIncome,
-          expenses
+          newTransactions
         });
+        // let income = 0;
+        // let generalIncome = 0;
+        // let expenses = 0;
+        // transactions.forEach(transaction => {
+        //   if (transaction.type === "add") {
+        //     transaction.wallet_id
+        //       ? (income += transaction.amount)
+        //       : (generalIncome += transaction.amount);
+        //   } else if (transaction.type === "remove") {
+        //     expenses += transaction.amount;
+        //   }
+        // });
+        // this.setState({
+        //   transactions,
+        //   newTransactions,
+        //   income,
+        //   generalIncome,
+        //   expenses
+        // });
 
         newTransactions &&
           (newTransactions.length > 0
@@ -118,12 +121,46 @@ class DashboardPage extends Component {
         throw new Error(transactionResponse.data.message);
       }
 
+      const goalResponse = await axios.get("/api/goals");
+      if (goalResponse.data.success) {
+        this.setState({ goals: goalResponse.data.items[0] });
+      } else {
+        throw new Error(goalResponse);
+      }
+
+      let income = 0;
+      let generalIncome = 0;
+      let expenses = 0;
+      this.state.transactions.forEach(transaction => {
+        if (transaction.type === "add") {
+          transaction.wallet_id
+            ? (income += transaction.amount)
+            : (generalIncome += transaction.amount);
+        } else if (transaction.type === "remove") {
+          expenses += transaction.amount;
+        }
+      });
+      this.state.goals.forEach(goal => {
+        if (goal.status === "not_met") {
+          goal.transfers.forEach(transfer => {
+            expenses += transfer.amount;
+          })
+        }
+      })
+      this.setState({
+        income,
+        generalIncome,
+        expenses
+      });
+
       const itemResponse = await axios.get("/api/items");
       if (itemResponse.data.success) {
         this.setState({ items: itemResponse.data.items[0] });
       } else {
         throw new Error(itemResponse.data.message);
       }
+
+      this.setState({ ismounted: true });
     } catch (e) {
       alert(e.message);
     }
@@ -222,7 +259,7 @@ class DashboardPage extends Component {
     if (this.errorCheck()) {
       const body = {
         type: this.state.modalType === "add-money" ? "add" : "remove",
-        amount: this.state.modalAmount,
+        amount: this.state.modalAmount.toFixed(2),
         description: this.state.modalDescription,
         wallet_id: this.state.modalCategory,
         date: this.state.modalDate,
@@ -312,7 +349,7 @@ class DashboardPage extends Component {
   confirmDelete = async wallet => {
     try {
       const name = prompt("Please enter the name of the wallet you want to delete");
-      if (name.toLowerCase() === wallet.category.toLowerCase()) {
+      if (name && name.toLowerCase() === wallet.category.toLowerCase()) {
         const res = await axios.delete(`/api/wallets?id=${wallet._id}`);
         if (res.data.success) {
           this.componentDidMount();
@@ -320,7 +357,7 @@ class DashboardPage extends Component {
           alert(res.data.message);
         }
         this.setState({ modal: false });
-      } else {
+      } else if (name) {
         alert("You entered an incorrect name");
         this.setState({ modal: false });
       }
@@ -336,6 +373,18 @@ class DashboardPage extends Component {
         transaction.type === "add" ? (delta += transaction.amount) : (delta -= transaction.amount);
       }
     });
+    this.state.goals.forEach(goal => {
+      if (goal.status === "not_met") {
+        goal.transfers.forEach(transfer => {
+          if (transfer.wallet_id === wallet._id) {
+            delta -= transfer.amount;
+          } else {
+            console.log(transfer.wallet_id);
+            console.log(wallet._id);
+          }
+        })
+      }
+    })
     return (this.state.generalIncome * (wallet.percentage / 100) + delta).toFixed(2);
   };
 
@@ -907,7 +956,7 @@ class DashboardPage extends Component {
                   </Col>
                 </Row>
               </div>
-            ) : this._ismounted ? (
+            ) : this.state.ismounted ? (
               <div>
                 <div style={{ marginBottom: window.innerHeight * 0.1 }} />
                 <div style={{ width: window.innerwidth * 0.8 }}>

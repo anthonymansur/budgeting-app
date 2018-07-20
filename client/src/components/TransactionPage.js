@@ -135,7 +135,7 @@ export default class TransactionPage extends React.Component {
   onEditTransaction = async () => {
     const body = {
       description: this.state.modalDescription,
-      amount: this.state.modalAmount,
+      amount: this.state.modalAmount.toFixed(2),
       date: this.state.modalDate,
       wallet_id: this.state.modalCategory,
       transaction_id: this.state.modalTransaction._id,

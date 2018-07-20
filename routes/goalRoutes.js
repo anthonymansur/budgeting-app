@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const ObjectId = require("mongoose").Types.ObjectId;
 const Goal = mongoose.model("Goal");
 
 module.exports = app => {
@@ -7,7 +8,7 @@ module.exports = app => {
       const goals = await Goal.find({ user_id: req.user.id });
       res.json({
         success: true,
-        items: [items]
+        items: [goals]
       });
     } catch (e) {
       res.json({
@@ -42,6 +43,21 @@ module.exports = app => {
       });
     } catch (e) {
       console.log(e);
+      res.json({
+        success: false,
+        message: e.message
+      });
+    }
+  });
+
+  app.delete("/api/goals/:id", async (req, res) => {
+    try {
+      const id = ObjectId(req.params.id);
+      await Goal.findByIdAndDelete(id);
+      res.json({
+        success: true
+      });
+    } catch (e) {
       res.json({
         success: false,
         message: e.message
