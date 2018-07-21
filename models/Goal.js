@@ -12,7 +12,7 @@ const goalSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["not_met", "met", "redeemed"],
+    enum: ["not_met", "met"],
     default: "not_met"
   },
   transfers: [

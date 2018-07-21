@@ -141,12 +141,10 @@ class DashboardPage extends Component {
         }
       });
       this.state.goals.forEach(goal => {
-        if (goal.status === "not_met") {
-          goal.transfers.forEach(transfer => {
-            expenses += transfer.amount;
-          })
-        }
-      })
+        goal.transfers.forEach(transfer => {
+          expenses += transfer.amount;
+        });
+      });
       this.setState({
         income,
         generalIncome,
@@ -374,17 +372,12 @@ class DashboardPage extends Component {
       }
     });
     this.state.goals.forEach(goal => {
-      if (goal.status === "not_met") {
-        goal.transfers.forEach(transfer => {
-          if (transfer.wallet_id === wallet._id) {
-            delta -= transfer.amount;
-          } else {
-            console.log(transfer.wallet_id);
-            console.log(wallet._id);
-          }
-        })
-      }
-    })
+      goal.transfers.forEach(transfer => {
+        if (transfer.wallet_id === wallet._id) {
+          delta -= transfer.amount;
+        }
+      });
+    });
     return (this.state.generalIncome * (wallet.percentage / 100) + delta).toFixed(2);
   };
 

@@ -20,7 +20,9 @@ import {
   Card,
   CardBody,
   CardTitle,
-  Tooltip
+  Tooltip,
+  ListGroup,
+  ListGroupItem
 } from "reactstrap";
 import axios from "axios";
 import moment from "moment-timezone";
@@ -41,7 +43,7 @@ export default class GoalPage extends React.Component {
       goals: [],
       wallets: [],
       modal: false,
-      modalGoal: {},
+      modalGoal: null,
       modalType: "",
       modalName: "",
       modalNameError: false,
@@ -175,7 +177,18 @@ export default class GoalPage extends React.Component {
       this.setState({ modalName: value.substring(0, 26) });
     }
     if (name === "amount") {
-      this.setState({ modalAmount: parseFloat(value.substring(0, 10)) });
+      if (this.state.modalGoal) {
+        let currAmount = 0;
+        this.state.modalGoal.transfers.forEach(transfer => {
+          currAmount += transfer.amount;
+        });
+        let diff = this.state.modalGoal.amount - currAmount;
+        let amount = parseFloat(value.substring(0, 10));
+        amount = diff < amount ? diff : amount;
+        this.setState({ modalAmount: amount });
+      } else {
+        this.setState({ modalAmount: parseFloat(value.substring(0, 10)) });
+      }
     }
     if (name === "date") {
       this.setState({
@@ -240,12 +253,22 @@ export default class GoalPage extends React.Component {
         const body = {
           $push: {
             transfers: {
-              amount: this.state.modalAmount.toFixed(2),
+              amount: this.state.modalAmount,
               wallet_id: ObjectId(this.state.modalWallet),
               date: formattedNow
             }
           }
         };
+        let amount = 0;
+        this.state.modalGoal.transfers.forEach(transfer => {
+          amount += transfer.amount;
+        });
+        amount += this.state.modalAmount;
+        console.log(this.state.modalGoal.amount === amount);
+        console.log(amount);
+        console.log(this.state.modalGoal.amount);
+        body.status = this.state.modalGoal.amount === amount ? "met" : "not_met";
+        console.log(body);
         const res = await axios.put(`/api/goals/${this.state.modalGoal._id}`, body);
         if (res.data.success) {
           this.refreshState();
@@ -342,7 +365,7 @@ export default class GoalPage extends React.Component {
               <InputGroup>
                 <InputGroupAddon addonType="prepend">$</InputGroupAddon>
                 <Input
-                  type="text"
+                  type="number"
                   name="amount"
                   id="amount"
                   value={this.state.modalAmount || ""}
@@ -392,7 +415,7 @@ export default class GoalPage extends React.Component {
               <InputGroup>
                 <InputGroupAddon addonType="prepend">$</InputGroupAddon>
                 <Input
-                  type="text"
+                  type="number"
                   name="amount"
                   value={this.state.modalAmount || ""}
                   invalid={this.state.modalAmountError}
@@ -494,132 +517,162 @@ export default class GoalPage extends React.Component {
         {this.state.goals.length ? (
           <Row>
             <Col lg={{ size: 6, offset: 3 }}>
-              <Row>
-                <div className="col-auto mr-auto">
-                  <h1 className="white-text">Goals</h1>
-                </div>
-                <div className="col-auto">
-                  <a href="#" id="tooltip">
-                    <i className="material-icons" id="tooltip" style={{ color: "#007bff" }}>
-                      info_outline
-                    </i>
-                  </a>
-                  <Tooltip
-                    placement="left"
-                    isOpen={this.state.tooltipOpen}
-                    target="tooltip"
-                    toggle={this.toggleTooltip}
-                  >
-                    Feel free to message owner for help
-                  </Tooltip>
-                </div>
-              </Row>
-              <br />
               <div>
-                {this.state.goals.map(goal => {
-                  let currAmount = 0;
-                  goal.transfers.forEach(transfer => {
-                    currAmount += transfer.amount;
-                  });
-                  const daysLeft = moment(goal.end_date).diff(now, "days") + 1;
-                  return (
-                    <div>
-                      <Card>
-                        <CardBody>
-                          <CardTitle className="text-left">
-                            <Row>
-                              <div className="col-auto mr-auto">
-                                <h2>{goal.name}</h2>
-                              </div>
-                              <div className="col-auto">
-                                {goal.auto_payment === "off" ? (
+                <Row>
+                  <div className="col-auto mr-auto">
+                    <h1 className="white-text">Goals</h1>
+                  </div>
+                  <div className="col-auto">
+                    <a href="#" id="tooltip">
+                      <i className="material-icons" id="tooltip" style={{ color: "#007bff" }}>
+                        info_outline
+                      </i>
+                    </a>
+                    <Tooltip
+                      placement="left"
+                      isOpen={this.state.tooltipOpen}
+                      target="tooltip"
+                      toggle={this.toggleTooltip}
+                    >
+                      Feel free to message owner for help
+                    </Tooltip>
+                  </div>
+                </Row>
+                <br />
+                <div>
+                  {this.state.goals
+                    .filter(goal => {
+                      return goal.status === "not_met";
+                    })
+                    .map(goal => {
+                      let currAmount = 0;
+                      goal.transfers.forEach(transfer => {
+                        currAmount += transfer.amount;
+                      });
+                      const daysLeft = moment(goal.end_date).diff(now, "days") + 1;
+                      return (
+                        <div>
+                          <Card>
+                            <CardBody>
+                              <CardTitle className="text-left">
+                                <Row>
+                                  <div className="col-auto mr-auto">
+                                    <h2>{goal.name}</h2>
+                                  </div>
+                                  <div className="col-auto">
+                                    {goal.auto_payment === "off" ? (
+                                      <Button
+                                        color="link"
+                                        style={{ padding: "0", fontSize: "1.2rem" }}
+                                        onClick={() => this.toggleAuto(goal)}
+                                      >
+                                        Set up automatic payment
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        color="link"
+                                        style={{ padding: "0", fontSize: "1.2rem" }}
+                                        onClick={() => this.disableAuto(goal)}
+                                      >
+                                        Turn off automatic payment
+                                      </Button>
+                                    )}
+                                  </div>
+                                </Row>
+                              </CardTitle>
+                              <Row>
+                                <div className="col-auto mr-auto">
+                                  {daysLeft} day{daysLeft === 1 ? "" : "s"} left
+                                </div>
+                                <div className="col-auto">
+                                  {moment(goal.end_date).year() === now.year()
+                                    ? moment(goal.end_date).format("MMM D")
+                                    : moment(goal.end_date).format("MMM D, YYYY")}
+                                </div>
+                              </Row>
+                              <Progress value={(currAmount / goal.amount) * 100} color="success" />
+                              <br />
+                              <Row className="text-center">
+                                <Col>
+                                  <h3>{numeral(currAmount).format("$0,0.00")}</h3>
+                                  <p className="text-muted">Saved</p>
+                                </Col>
+                                <Col>
+                                  <h3>
+                                    {numeral((goal.amount - currAmount) / daysLeft).format(
+                                      "$0,0.00"
+                                    )}
+                                  </h3>
+                                  <p className="text-muted">Per day</p>
+                                </Col>
+                                <Col>
+                                  <h3>{numeral(goal.amount).format("$0,0.00")}</h3>
+                                  <p className="text-muted">Target</p>
+                                </Col>
+                              </Row>
+                              <br />
+                              <Row className="text-center">
+                                <Col>
                                   <Button
                                     color="link"
-                                    style={{ padding: "0", fontSize: "1.2rem" }}
-                                    onClick={() => this.toggleAuto(goal)}
+                                    style={{ padding: "0", fontSize: "1.6rem" }}
+                                    onClick={() => this.toggleTransfer(goal)}
                                   >
-                                    Set up automatic payment
+                                    Transfer
                                   </Button>
-                                ) : (
+                                </Col>
+                                <Col>
                                   <Button
                                     color="link"
-                                    style={{ padding: "0", fontSize: "1.2rem" }}
-                                    onClick={() => this.disableAuto(goal)}
+                                    style={{ padding: "0", fontSize: "1.6rem" }}
+                                    onClick={() => this.toggleUpdate(goal)}
                                   >
-                                    Turn off automatic payment
+                                    Update
                                   </Button>
-                                )}
-                              </div>
-                            </Row>
-                          </CardTitle>
-                          <Row>
-                            <div className="col-auto mr-auto">
-                              {daysLeft} day{daysLeft === 1 ? "" : "s"} left
-                            </div>
-                            <div className="col-auto">
-                              {moment(goal.end_date).year() === now.year()
-                                ? moment(goal.end_date).format("MMM D")
-                                : moment(goal.end_date).format("MMM D, YYYY")}
-                            </div>
-                          </Row>
-                          <Progress value={(currAmount / goal.amount) * 100} color="success" />
+                                </Col>
+                                <Col>
+                                  <Button
+                                    color="link"
+                                    style={{ padding: "0", fontSize: "1.6rem" }}
+                                    onClick={() => this.onDelete(goal)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </Col>
+                              </Row>
+                            </CardBody>
+                          </Card>
                           <br />
-                          <Row className="text-center">
-                            <Col>
-                              <h3>{numeral(currAmount).format("$0,0.00")}</h3>
-                              <p className="text-muted">Saved</p>
-                            </Col>
-                            <Col>
-                              <h3>
-                                {numeral((goal.amount - currAmount) / daysLeft).format("$0,0.00")}
-                              </h3>
-                              <p className="text-muted">Per day</p>
-                            </Col>
-                            <Col>
-                              <h3>{numeral(goal.amount).format("$0,0.00")}</h3>
-                              <p className="text-muted">Target</p>
-                            </Col>
-                          </Row>
-                          <br />
-                          <Row className="text-center">
-                            <Col>
-                              <Button
-                                color="link"
-                                style={{ padding: "0", fontSize: "1.6rem" }}
-                                onClick={() => this.toggleTransfer(goal)}
-                              >
-                                Transfer
-                              </Button>
-                            </Col>
-                            <Col>
-                              <Button
-                                color="link"
-                                style={{ padding: "0", fontSize: "1.6rem" }}
-                                onClick={() => this.toggleUpdate(goal)}
-                              >
-                                Update
-                              </Button>
-                            </Col>
-                            <Col>
-                              <Button
-                                color="link"
-                                style={{ padding: "0", fontSize: "1.6rem" }}
-                                onClick={() => this.onDelete(goal)}
-                              >
-                                Cancel
-                              </Button>
-                            </Col>
-                          </Row>
-                        </CardBody>
-                      </Card>
-                      <br />
-                    </div>
-                  );
-                })}
-                <Button block color="success" onClick={this.toggleAddGoal}>
-                  Add New Goal
-                </Button>
+                        </div>
+                      );
+                    })}
+                  <Button block color="success" onClick={this.toggleAddGoal}>
+                    Add New Goal
+                  </Button>
+                </div>
+                <br />
               </div>
+              <br />
+              <h1 className="white-text">Met Goals</h1>
+              <br />
+              <ListGroup>
+                {this.state.goals
+                  .filter(goal => {
+                    return goal.status === "met";
+                  })
+                  .map(goal => {
+                    return (
+                      <ListGroupItem>
+                        <Row>
+                          <div className="col-auto mr-auto">
+                            <h2>{goal.name}</h2>
+                          </div>
+                          <div className="col-auto">{goal.amount}</div>
+                        </Row>
+                      </ListGroupItem>
+                    );
+                  })}
+              </ListGroup>
             </Col>
           </Row>
         ) : this.state.ismounted ? (
