@@ -41,7 +41,6 @@ const TransactionsFn = async () => {
           }
         );
         const transactions = transactionsResponse.transactions;
-        access_token === "access-development-6344f135-1be3-466c-b177-e63edbcc34c7" && console.log(transactions);
         transactions &&
           transactions.forEach(async transaction => {
             const existingTransaction = await Transaction.findOne({
