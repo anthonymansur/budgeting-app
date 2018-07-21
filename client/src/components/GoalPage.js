@@ -104,6 +104,14 @@ export default class GoalPage extends React.Component {
     });
   };
 
+  toggleRedeem = goal => {
+    this.setState({
+      modal: !this.state.modal,
+      modalType: "redeem",
+      modalGoal: goal
+    });
+  };
+
   toggleUpdate = goal => {
     this.setState({
       modal: !this.state.modal,
@@ -259,16 +267,12 @@ export default class GoalPage extends React.Component {
             }
           }
         };
-        let amount = 0;
-        this.state.modalGoal.transfers.forEach(transfer => {
-          amount += transfer.amount;
-        });
-        amount += this.state.modalAmount;
-        console.log(this.state.modalGoal.amount === amount);
-        console.log(amount);
-        console.log(this.state.modalGoal.amount);
-        body.status = this.state.modalGoal.amount === amount ? "met" : "not_met";
-        console.log(body);
+        // let amount = 0;
+        // this.state.modalGoal.transfers.forEach(transfer => {
+        //   amount += transfer.amount;
+        // });
+        // amount += this.state.modalAmount;
+        // body.status = this.state.modalGoal.amount === amount ? "met" : "not_met";
         const res = await axios.put(`/api/goals/${this.state.modalGoal._id}`, body);
         if (res.data.success) {
           this.refreshState();
@@ -296,6 +300,23 @@ export default class GoalPage extends React.Component {
         } else {
           alert(res.data.message);
         }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  onRedeemSubmit = async () => {
+    try {
+      const body = {
+        status: "met"
+      };
+      const res = await axios.put(`/api/goals/${this.state.modalGoal._id}`, body);
+      if (res.data.success) {
+        this.refreshState();
+        this.componentDidMount();
+      } else {
+        alert(res.data.message);
       }
     } catch (e) {
       console.log(e);
@@ -510,6 +531,32 @@ export default class GoalPage extends React.Component {
     );
   };
 
+  redeemModal = () => {
+    return (
+      <Modal isOpen={this.state.modal} toggle={this.toggle}>
+        <ModalHeader toggle={this.toggle}>Redeem your goal</ModalHeader>
+        <ModalBody>
+          <h3>Congrats on reaching your new goal!</h3>
+          <p className="small-text">
+            By redeeming your goal, you won't be able to cancel it anymore nor receive back the
+            money you transferred from your wallets to reach this goal. We will keep this goal
+            displayed for you below for your records. (Tip: if you need to budget this goal, we
+            recommend creating a new wallet with 0 percentage and inserting your goal amount
+            directly.)
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={this.onRedeemSubmit}>
+            Redeem your goal
+          </Button>{" "}
+          <Button color="secondary" onClick={this.toggle}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+    );
+  };
+
   render() {
     return (
       <Container>
@@ -613,13 +660,23 @@ export default class GoalPage extends React.Component {
                               <br />
                               <Row className="text-center">
                                 <Col>
-                                  <Button
-                                    color="link"
-                                    style={{ padding: "0", fontSize: "1.6rem" }}
-                                    onClick={() => this.toggleTransfer(goal)}
-                                  >
-                                    Transfer
-                                  </Button>
+                                  {goal.amount === currAmount ? (
+                                    <Button
+                                      color="danger"
+                                      style={{ fontSize: "1.6rem" }}
+                                      onClick={() => this.toggleRedeem(goal)}
+                                    >
+                                      Redeem
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      color="link"
+                                      style={{ padding: "0", fontSize: "1.6rem" }}
+                                      onClick={() => this.toggleTransfer(goal)}
+                                    >
+                                      Transfer
+                                    </Button>
+                                  )}
                                 </Col>
                                 <Col>
                                   <Button
@@ -662,12 +719,33 @@ export default class GoalPage extends React.Component {
                   })
                   .map(goal => {
                     return (
-                      <ListGroupItem>
+                      <ListGroupItem className="text-center">
                         <Row>
                           <div className="col-auto mr-auto">
-                            <h2>{goal.name}</h2>
+                            <h2>{goal.name}:</h2>
                           </div>
-                          <div className="col-auto">{numeral(goal.amount).format("$0,0")}</div>
+                          <div className="col-auto">
+                            <h2>{numeral(goal.amount).format("$0,0")}</h2>
+                          </div>
+                        </Row>
+                        <br />
+                        <Row>
+                          <Col>
+                            <span>{moment(goal.start_date).format("MMM DD")}</span>
+                            <p className="text-muted">Started</p>
+                          </Col>
+                          <Col>
+                            <span>
+                              {moment(goal.transfers[goal.transfers.length - 1].date).format(
+                                "MMM DD"
+                              )}
+                            </span>
+                            <p className="text-muted">Reached</p>
+                          </Col>
+                          <Col>
+                            <span>{moment(goal.end_date).format("MMM DD")}</span>
+                            <p className="text-muted">Ended</p>
+                          </Col>
                         </Row>
                       </ListGroupItem>
                     );
@@ -704,7 +782,9 @@ export default class GoalPage extends React.Component {
             ? this.transferModal()
             : this.state.modalType === "auto"
               ? this.autoModal()
-              : ""}
+              : this.state.modalType === "redeem"
+                ? this.redeemModal()
+                : ""}
       </Container>
     );
   }

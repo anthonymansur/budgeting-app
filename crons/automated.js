@@ -19,16 +19,19 @@ const AutomatedFn = async () => {
           currAmount += transfer.amount;
         });
         const daysLeft = moment(goal.end_date).diff(now, "days") + 1;
-        params = {
-          $push: {
-            transfers: {
-              amount: ((goal.amount - currAmount) / daysLeft).toFixed(2),
-              wallet_id: goal.wallet_id,
-              date: now
+        const amount = ((goal.amount - currAmount) / daysLeft).toFixed(2);
+        if (Math.round(amount)){
+          params = {
+            $push: {
+              transfers: {
+                amount: amount,
+                wallet_id: goal.wallet_id,
+                date: now
+              }
             }
           }
+          await Goal.findByIdAndUpdate(goal._id, params);
         }
-        await Goal.findByIdAndUpdate(goal._id, params);
       } catch (e) {
         console.log(e);
       }
