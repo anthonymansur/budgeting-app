@@ -26,33 +26,42 @@ const TransactionsFn = async () => {
     items.forEach(async item => {
       try {
         const access_token = item.access_token;
-        const startDate = now
-          .subtract(30, "days")
+        const startDate = moment()
+          .subtract(7, "days")
           .format("YYYY-MM-DD");
-        const endDate = now
+        const endDate = moment()
           .format("YYYY-MM-DD");
         const transactionsResponse = await client.getTransactions(
           access_token,
           startDate,
-          endDate,
-          {
-            count: 250,
-            offset: 0
-          }
+          endDate
         );
         const transactions = transactionsResponse.transactions;
+        // console.log(transactions);
         transactions &&
           transactions.forEach(async transaction => {
             const existingTransaction = await Transaction.findOne({
               transaction_id: transaction.transaction_id
             });
             if (!existingTransaction) {
+              let description = "";
+              if (transaction.name.substring(0, 13) === "ORIG CO NAME:") {
+                const indexOfDesc = transaction.name.indexOf("CO ENTRY DESCR:")
+                const indexOfEnd = transaction.name.indexOf("SEC:");
+
+                description = transaction.name.substring(13, indexOfDesc < 39 ? indexOfDesc : 39);
+                if (indexOfDesc < 39) {
+                  description = description + " - " + transaction.name.substring(indexOfDesc+15, indexOfEnd);
+                }
+              } else {
+                description = transaction.name.substring(0, 26);
+              }
               const trans = await new Transaction({
                 user_id: item.user_id,
                 wallet_id: null,
                 amount: transaction.amount > 0 ? transaction.amount : -transaction.amount,
                 type: transaction.amount > 0 ? "remove" : "add",
-                description: transaction.name.substring(0, 26),
+                description,
                 date: transaction.date,
                 transaction_id: transaction.transaction_id,
                 status: "pending"
