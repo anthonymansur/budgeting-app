@@ -667,7 +667,7 @@ export default class GoalPage extends React.Component {
                           <div className="col-auto mr-auto">
                             <h2>{goal.name}</h2>
                           </div>
-                          <div className="col-auto">{goal.amount}</div>
+                          <div className="col-auto">{numeral(goal.amount).format("$0,0")}</div>
                         </Row>
                       </ListGroupItem>
                     );
