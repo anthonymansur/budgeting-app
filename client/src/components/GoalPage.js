@@ -27,9 +27,7 @@ import {
 import axios from "axios";
 import moment from "moment-timezone";
 import numeral from "numeral";
-import mongoose from "mongoose";
 
-const ObjectId = mongoose.Types.ObjectId;
 const TIMEZONE = "America/New_York";
 const now = moment().tz(TIMEZONE);
 const formattedNow = moment()
@@ -262,7 +260,7 @@ export default class GoalPage extends React.Component {
           $push: {
             transfers: {
               amount: this.state.modalAmount,
-              wallet_id: ObjectId(this.state.modalWallet),
+              wallet_id: this.state.modalWallet,
               date: formattedNow
             }
           }
