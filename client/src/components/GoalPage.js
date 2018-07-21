@@ -708,8 +708,14 @@ export default class GoalPage extends React.Component {
                 <br />
               </div>
               <br />
-              <h1 className="white-text">Met Goals</h1>
-              <br />
+              {this.state.goals.filter(goal => {
+                return goal.status === "met";
+              }).length !== 0 && (
+                <div>
+                  <h1 className="white-text">Met Goals</h1>
+                  <br />
+                </div>
+              )}
               <ListGroup>
                 {this.state.goals
                   .filter(goal => {
