@@ -29,6 +29,7 @@ require('./routes/loanRoutes')(app);
 require('./routes/plaidRoutes')(app);
 require('./routes/transactionRoutes')(app);
 require('./routes/walletRoutes')(app);
+require('./routes/billRoutes')(app);
 
 //crons
 require(`${__dirname}/crons/transactions`);

@@ -18,5 +18,6 @@ module.exports = {
     Wallet: require('./Wallet'),
     Loan: require('./Loan'),
     Item: require('./Item'),
-    Goal: require('./Goal')
+    Goal: require('./Goal'),
+    Bill: require('./Bill')
 };
