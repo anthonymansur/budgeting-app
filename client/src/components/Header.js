@@ -10,6 +10,8 @@ import {
   NavLink
 } from 'reactstrap';
 
+import './styles.css';
+
 export default class Header extends React.Component {
   constructor(props) {
     super(props);

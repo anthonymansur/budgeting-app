@@ -3,8 +3,8 @@ import { Container, Row, Button, ButtonGroup } from "reactstrap";
 import axios from "axios";
 import numeral from "numeral";
 import moment from "moment-timezone";
-import DoughnutChart from "./DoughnutChart";
-import Expenses from "./Expenses";
+import DoughnutChart from "./components/DoughnutChart";
+import Expenses from "./components/Expenses";
 
 const TIMEZONE = "America/New_York";
 const now = moment().tz(TIMEZONE);

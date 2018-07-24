@@ -2,29 +2,28 @@ import React, { Component } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import axios from "axios";
 
-import Header from "./Header";
-import Footer from "./Footer";
-import LoginPage from "./LoginPage";
-import DashboardPage from "./DashboardPage";
-import TransactionPage from "./TransactionPage";
-import SummaryPage from "./SummaryPage";
-import LoanPage from "./LoanPage";
-import GoalPage from "./GoalPage";
-import BillPage from "./BillPage";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import LoginPage from "./scenes/Login";
+import DashboardPage from "./scenes/Dashboard";
+import TransactionPage from "./scenes/Transaction";
+import SummaryPage from "./scenes/Summary";
+import LoanPage from "./scenes/Loan";
+import GoalPage from "./scenes/Goal";
+import BillPage from "./scenes/Bill";
 
 export default class App extends Component {
   constructor() {
     super();
     this.state = {
-      auth: false
+      auth: false,
+      ismounted: false
     };
-    this._ismounted = false;
   }
 
   async componentDidMount() {
-    this._ismounted = true;
     this.user = await axios.get("/api/current_user");
-    await this.setState({ auth: this.user.data ? true : false });
+    await this.setState({ auth: this.user.data ? true : false, ismounted: true });
   }
 
   render() {
@@ -39,7 +38,7 @@ export default class App extends Component {
               render={() =>
                 this.state.auth ? (
                   <DashboardPage user={this.user.data} />
-                ) : this._ismounted ? (
+                ) : this.state.ismounted ? (
                   <LoginPage />
                 ) : (
                   ""
@@ -47,10 +46,10 @@ export default class App extends Component {
               }
             />
             <Route exact path="/transactions" component={TransactionPage} />
-            <Route exact path="/summary" component={SummaryPage} />
-            <Route exact path="/loans" component={LoanPage} />
-            <Route exact path="/goals" component={GoalPage} />
-            <Route exact path="/bills" component={BillPage} />
+            <Route exact path="/summary"      component={SummaryPage} />
+            <Route exact path="/loans"        component={LoanPage} />
+            <Route exact path="/goals"        component={GoalPage} />
+            <Route exact path="/bills"        component={BillPage} />
             {this.state.auth ? <Footer /> : ""}
           </div>
         </BrowserRouter>

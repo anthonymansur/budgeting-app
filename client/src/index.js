@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './styles/style.css';
+import './../node_modules/normalize.css/normalize.css';
+import './../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import './styles.css';
 
-import App from "./components/App";
+import App from "./App";
 
 // Development only axios helpers!
 import axios from 'axios';

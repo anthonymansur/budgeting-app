@@ -1,3 +1,6 @@
+@import "../styles.scss";
+
+// Header
 .header {
   background-color:$dark-blue;
 }
@@ -14,4 +17,10 @@
 
 .header__text:hover {
   // color:$dark-green !important;
+}
+
+// Footer
+.footer {
+  margin-top: $xl-size;
+  margin-bottom: $m-size;
 }

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Card, CardBody, CardTitle, CardText, Button } from 'reactstrap';
 
+import './styles.css';
+
 export default () => {
   return (
     <div className="row h-100 align-items-center justify-content-center" id="login-page">
