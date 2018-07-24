@@ -5,6 +5,7 @@ const Wallet = require('./Wallet');
 
 const userSchema = new Schema({
   googleId: String,
+  facebookId: String,
   emails: Object
 });
 

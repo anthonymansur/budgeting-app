@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './../node_modules/normalize.css/normalize.css';
-import './../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import 'normalize.css/normalize.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
 
 import App from "./App";
