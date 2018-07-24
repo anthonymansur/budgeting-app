@@ -17,10 +17,14 @@ export default () => {
             <a className="btn btn-block btn-social btn-google small-text" href="/auth/google">
               <i className="fa fa-google" /> Sign in with Google
             </a>
+            { process.env.PORT &&
+            <div>
             <br />
             <a className="btn btn-block btn-social btn-facebook" href="/auth/facebook">
             <i className="fa fa-facebook-f" />Sign in with Facebook
             </a>
+            </div>
+            }
           </CardBody>
         </Card>
       </div>
