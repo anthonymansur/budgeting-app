@@ -8,10 +8,7 @@ module.exports = app => {
 
   app.get(
     "/auth/facebook",
-    passport.authenticate("facebook"),
-    (req, res) => {
-      res.redirect("/");
-    }
+    passport.authenticate("facebook", { scope: ["profile", "email"] })
   );
 
   app.get(
