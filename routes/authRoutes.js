@@ -10,7 +10,7 @@ module.exports = app => {
     "/auth/facebook",
     passport.authenticate("facebook"),
     (req, res) => {
-      res.redirect("https://mansur-budgeting.herokuapp.com/");
+      res.redirect("/");
     }
   );
 

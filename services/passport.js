@@ -53,7 +53,7 @@ passport.use(
     {
       clientID: keys.facebookAppId,
       clientSecret: keys.facebookAppSecret,
-      callbackURL: "https://mansur-budgeting.herokuapp.com/auth/facebook/callback",
+      callbackURL: "/auth/facebook/callback",
       proxy: true
     },
     async (accessToken, refreshToken, profile, done) => {
