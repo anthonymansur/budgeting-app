@@ -263,7 +263,7 @@ export default class LoanPage extends React.Component {
               <Input
                 type="date"
                 name="date"
-                value={this.state.modalDate}
+                defaultValue={now}
                 onChange={this.onChange}
               />
             </FormGroup>
@@ -352,7 +352,7 @@ export default class LoanPage extends React.Component {
               <Input
                 type="date"
                 name="date"
-                value={this.state.modalDate}
+                defaultValue={now}
                 onChange={this.onChange}
               />
             </FormGroup>

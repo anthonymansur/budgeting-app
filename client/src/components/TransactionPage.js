@@ -24,6 +24,11 @@ import { DateRangePicker } from "react-dates";
 import "react-dates/lib/css/_datepicker.css";
 import ToggleButton from "react-toggle-button";
 
+const TIMEZONE = "America/New_York";
+const now = moment()
+  .tz(TIMEZONE)
+  .format("YYYY-MM-DD");
+
 export default class TransactionPage extends React.Component {
   constructor() {
     super();
@@ -367,7 +372,7 @@ export default class TransactionPage extends React.Component {
               <Input
                 type="date"
                 name="date"
-                value={this.state.modalDate}
+                defaultValue={now}
                 onChange={this.onChange}
               />
             </FormGroup>
