@@ -40,7 +40,7 @@ passport.use(
           }
           return done(null, existingUser);
         }
-        const user = await new User({ googleId: profile.id, emails: profile.emails.value, display_name: profile.displayName }).save();
+        const user = await new User({ googleId: profile.id, emails: profile.emails, display_name: profile.displayName }).save();
         done(null, user);
       } catch (e) {
         console.log(e);
