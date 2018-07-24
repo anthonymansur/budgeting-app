@@ -537,7 +537,7 @@ export default class DashboardPage extends Component {
             editWallet={this.editWallet}
             confirmDelete={this.confirmDelete}
           />
-        ) : (
+        ) : this.state.modalType === "new" ? (
           <TransactionModal
             state={this.state}
             toggle={this.toggle}
@@ -546,7 +546,7 @@ export default class DashboardPage extends Component {
             onChange={this.onChange}
             onEdit={this.onEdit}
           />
-        )}
+        ) : ""}
         <br />
       </Container>
     );
