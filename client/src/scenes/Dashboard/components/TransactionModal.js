@@ -34,7 +34,7 @@ export default ({ state, toggle, expandTransaction, onChange, onToggle, onEdit }
           ""
         )}
         <ListGroup>
-          {state.newTransactions
+          {state.newTransactions && state.newTransactions
             .filter(trans => {
               return trans.type === "add";
             })
@@ -91,11 +91,7 @@ export default ({ state, toggle, expandTransaction, onChange, onToggle, onEdit }
                             </i>
                           }
                           value={state.modalValue}
-                          onToggle={value => {
-                            this.setState({
-                              modalValue: !value
-                            });
-                          }}
+                          onToggle={onToggle}
                         />
                       </FormGroup>
                       <FormGroup>
@@ -200,11 +196,7 @@ export default ({ state, toggle, expandTransaction, onChange, onToggle, onEdit }
                             </i>
                           }
                           value={state.modalValue}
-                          onToggle={value => {
-                            this.setState({
-                              modalValue: !value
-                            });
-                          }}
+                          onToggle={onToggle}
                         />
                       </FormGroup>
                       <FormGroup>
