@@ -537,7 +537,7 @@ export default class DashboardPage extends Component {
             editWallet={this.editWallet}
             confirmDelete={this.confirmDelete}
           />
-        ) : this.state.modalType === "new" ? (
+        ) : this.state.modalType === "new" && this.state.expandTransaction ? (
           <TransactionModal
             state={this.state}
             toggle={this.toggle}
