@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, CardBody, CardTitle, CardText, Button } from "reactstrap";
 
-import "bootstrap/dist/css/bootstrap-social.css";
-import "font-awesome/css/font-awesome.min.css"; 
 import "./styles.css";
+import "./bootstrap-social.css";
+import "font-awesome/css/font-awesome.min.css"; 
 
 export default () => {
   return (
