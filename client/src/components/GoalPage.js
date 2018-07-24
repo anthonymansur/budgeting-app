@@ -399,7 +399,7 @@ export default class GoalPage extends React.Component {
               <Input
                 type="date"
                 name="date"
-                value={this.state.modalDate}
+                defaultValue={formattedNow}
                 onChange={this.onChange}
               />
             </FormGroup>

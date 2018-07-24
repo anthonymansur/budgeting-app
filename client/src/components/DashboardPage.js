@@ -585,8 +585,8 @@ class DashboardPage extends Component {
               <Input
                 type="date"
                 name="date"
+                defaultValue={now}
                 id="date"
-                value={this.state.modalDate}
                 onChange={this.onChange}
               />
             </FormGroup>
