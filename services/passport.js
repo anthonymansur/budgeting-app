@@ -39,7 +39,7 @@ passport.use(
           }
           return done(null, existingUser);
         }
-        const user = await new User({ googleId: profile.id, emails: profile.emails }).save();
+        const user = await new User({ googleId: profile.id, emails: profile.emails.value }).save();
         done(null, user);
       } catch (e) {
         console.log(e);
@@ -54,6 +54,7 @@ passport.use(
       clientID: keys.facebookAppId,
       clientSecret: keys.facebookAppSecret,
       callbackURL: "/auth/facebook/callback",
+      profileFields: ['id', 'email'],
       proxy: true
     },
     async (accessToken, refreshToken, profile, done) => {
