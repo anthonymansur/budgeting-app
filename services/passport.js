@@ -35,12 +35,12 @@ passport.use(
           googleId: profile.id
         });
         if (existingUser) {
-          if (!existingUser.emails) {
-            await User.findByIdAndUpdate(existingUser._id, { emails: profile.emails });
+          if (!existingUser.emails || !existingUser.display_name) {
+            await User.findByIdAndUpdate(existingUser._id, { emails: profile.emails, display_name: profile.displayName });
           }
           return done(null, existingUser);
         }
-        const user = await new User({ googleId: profile.id, emails: profile.emails.value }).save();
+        const user = await new User({ googleId: profile.id, emails: profile.emails.value, display_name: profile.displayName }).save();
         done(null, user);
       } catch (e) {
         console.log(e);
@@ -55,7 +55,7 @@ passport.use(
       clientID: keys.facebookAppId,
       clientSecret: keys.facebookAppSecret,
       callbackURL: "/auth/facebook/callback",
-      profileFields: ['id', 'email'],
+      profileFields: ['id', 'email', 'displayName'],
       proxy: true
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -65,12 +65,12 @@ passport.use(
           facebookId: profile.id
         });
         if (existingUser) {
-          if (!existingUser.emails) {
-            await User.findByIdAndUpdate(existingUser._id, { emails: profile.emails });
+          if (!existingUser.emails || !existingUser.display_name) {
+            await User.findByIdAndUpdate(existingUser._id, { emails: profile.emails, display_name: profile.displayName });
           }
           return done(null, existingUser);
         }
-        const user = await new User({ facebookId: profile.id, emails: profile.emails }).save();
+        const user = await new User({ facebookId: profile.id, emails: profile.emails, display_name: profile.displayName }).save();
         done(null, user);
       } catch (e) {
         console.log(e);
