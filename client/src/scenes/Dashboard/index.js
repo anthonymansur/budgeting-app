@@ -3,6 +3,7 @@ import { Container, Row, Col, Button } from "reactstrap";
 import axios from "axios";
 import moment from "moment-timezone";
 import numeral from "numeral";
+import Joyride from "react-joyride";
 
 import './styles.css'
 
@@ -46,7 +47,20 @@ export default class DashboardPage extends Component {
       modalNameError: false,
       modalPercentage: 0,
       modalValue: false,
-      ismounted: false
+      ismounted: false,
+      run: true,
+      steps: [
+        {
+          target: '.step-1',
+          content: 'This if my awesome feature!',
+          placement: 'bottom',
+        },
+        {
+          target: '.step-2',
+          content: 'This if my awesome feature!',
+          placement: 'bottom',
+        }
+      ]
     };
   }
 
@@ -421,9 +435,18 @@ export default class DashboardPage extends Component {
     });
   };
 
+  callback = (data) => {
+    const { action, index, type } = data;
+  };
+
   render() {
     return (
       <Container>
+        <Joyride
+            steps={this.state.steps}
+            run={this.state.run}
+            callback={this.callback}
+          />
         <Row>
           <Col md="3" />
           <Col md="6">

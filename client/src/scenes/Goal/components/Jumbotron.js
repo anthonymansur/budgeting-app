@@ -12,7 +12,7 @@ export default ({ toggleAddGoal }) => {
       <br />
       <p className="lead">
         <div className="d-flex justify-content-center">
-          <Button block={true} color="success" onClick={this.toggleAddGoal}>
+          <Button block={true} color="success" onClick={toggleAddGoal}>
             Add Goal
           </Button>
         </div>

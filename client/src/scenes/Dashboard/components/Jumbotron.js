@@ -19,7 +19,7 @@ export default ({ addWalletToggle }) => {
         <br />
         <p className="lead">
           <div className="d-flex justify-content-center">
-            <Button block={true} color="success" onClick={addWalletToggle}>
+            <Button block={true} color="success" onClick={addWalletToggle} className="step-1">
               Add Wallet
             </Button>
           </div>

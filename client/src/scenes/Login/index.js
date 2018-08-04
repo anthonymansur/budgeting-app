@@ -15,11 +15,11 @@ export default () => {
             <CardTitle className="text-center card__title">Budgeting App</CardTitle>
             <CardText>Manage your expenses in an easy and intuitive way.</CardText>
             <a className="btn btn-block btn-social btn-google small-text" href="/auth/google">
-              <i className="fa fa-google" /> Sign in with Google
+              <i className="fa fa-google" /> <span className="login-text">Sign in with Google</span>
             </a>
             <br />
             <a className="btn btn-block btn-social btn-facebook" href="/auth/facebook">
-            <i className="fa fa-facebook-f" />Sign in with Facebook
+            <i className="fa fa-facebook-f" /><span className="login-text">Sign in with Facebook</span>
             </a>
           </CardBody>
         </Card>

@@ -7,7 +7,11 @@ const userSchema = new Schema({
   googleId: String,
   facebookId: String,
   emails: Object,
-  display_name: String
+  display_name: String,
+  display_tutorial: {
+    type: Boolean,
+    default: true
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

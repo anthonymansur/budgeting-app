@@ -10,7 +10,7 @@ import AutoModal from "./components/AutoModal";
 import RedeemModal from "./components/RedeemModal";
 import GoalCard from "./components/GoalCard";
 import MetGoals from "./components/MetGoals";
-import Jumbotron from "./components/Jumbotron"
+import Jumbotron from "./components/Jumbotron";
 
 const TIMEZONE = "America/New_York";
 const now = moment().tz(TIMEZONE);
@@ -72,6 +72,7 @@ export default class GoalPage extends React.Component {
   };
 
   toggleAddGoal = () => {
+    console.log("add");
     this.setState({
       modal: !this.state.modal,
       modalType: "add"
