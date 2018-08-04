@@ -260,12 +260,7 @@ export default class LoanPage extends React.Component {
             </FormGroup>
             <FormGroup>
               <Label>Date</Label>
-              <Input
-                type="date"
-                name="date"
-                defaultValue={now}
-                onChange={this.onChange}
-              />
+              <Input type="date" name="date" defaultValue={now} onChange={this.onChange} />
             </FormGroup>
             <FormGroup>
               <Label>Description</Label>
@@ -349,12 +344,7 @@ export default class LoanPage extends React.Component {
             </FormGroup>
             <FormGroup>
               <Label>Date</Label>
-              <Input
-                type="date"
-                name="date"
-                defaultValue={now}
-                onChange={this.onChange}
-              />
+              <Input type="date" name="date" defaultValue={now} onChange={this.onChange} />
             </FormGroup>
             <FormGroup>
               <Label>Description</Label>
@@ -429,6 +419,7 @@ export default class LoanPage extends React.Component {
                   .filter(loan => {
                     return (
                       loan.recipient &&
+                      loan.paid &&
                       (!this.state.startDate ||
                         moment(loan.date).dayOfYear() >=
                           moment(this.state.startDate).dayOfYear()) &&
@@ -484,7 +475,7 @@ export default class LoanPage extends React.Component {
                   .map(loan => {
                     return (
                       <tr
-                        className={loan.status ? "text-muted" : ""}
+                        className={loan.paid ? "text-muted" : ""}
                         onClick={() => {
                           this.toggleEdit(loan, "donated");
                         }}
@@ -559,11 +550,67 @@ export default class LoanPage extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {this.state.loans.map(loan => {
-                  return (
-                    loan.donor && (
+                {this.state.loans
+                  .filter(loan => {
+                    return (
+                      loan.donar &&
+                      loan.paid &&
+                      (!this.state.startDate ||
+                        moment(loan.date).dayOfYear() >=
+                          moment(this.state.startDate).dayOfYear()) &&
+                      (!this.state.endDate ||
+                        moment(loan.date).dayOfYear() <= moment(this.state.endDate).dayOfYear())
+                    );
+                  })
+                  .sort((a, b) => {
+                    if (
+                      moment(a.date)
+                        .utc()
+                        .years() >
+                      moment(b.date)
+                        .utc()
+                        .years()
+                    ) {
+                      return -1;
+                    } else if (
+                      moment(a.date)
+                        .utc()
+                        .years() <
+                      moment(b.date)
+                        .utc()
+                        .years()
+                    ) {
+                      return 1;
+                    } else if (
+                      moment(a.date)
+                        .utc()
+                        .dayOfYear() >
+                      moment(b.date)
+                        .utc()
+                        .dayOfYear()
+                    ) {
+                      return -1;
+                    } else if (
+                      moment(a.date)
+                        .utc()
+                        .dayOfYear() <
+                      moment(b.date)
+                        .utc()
+                        .dayOfYear()
+                    ) {
+                      return 1;
+                    } else if (a.amount > b.amount) {
+                      return -1;
+                    } else if (a.amount < b.amount) {
+                      return 1;
+                    } else {
+                      return 0;
+                    }
+                  })
+                  .map(loan => {
+                    return (
                       <tr
-                        className={loan.status ? "text-muted" : ""}
+                        className={loan.paid ? "text-muted" : ""}
                         onClick={() => {
                           this.toggleEdit(loan, "received");
                         }}
@@ -605,9 +652,8 @@ export default class LoanPage extends React.Component {
                             : "None"}
                         </td>
                       </tr>
-                    )
-                  );
-                })}
+                    );
+                  })}
               </tbody>
             </Table>
           </CardBody>
