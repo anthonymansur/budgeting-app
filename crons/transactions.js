@@ -37,13 +37,15 @@ const TransactionsFn = async () => {
           endDate
         );
         const transactions = transactionsResponse.transactions;
-        // console.log(transactions);
         transactions &&
           transactions.forEach(async transaction => {
             const existingTransaction = await Transaction.findOne({
               transaction_id: transaction.transaction_id
             });
-            if (!existingTransaction) {
+            const existingPendingTransaction = await Transaction.findOne({
+              transaction_id: transaction.pending_transaction_id
+            });
+            if (!existingTransaction && !existingPendingTransaction) {
               let description = "";
               if (transaction.name.substring(0, 13) === "ORIG CO NAME:") {
                 const indexOfDesc = transaction.name.indexOf("CO ENTRY DESCR:")
