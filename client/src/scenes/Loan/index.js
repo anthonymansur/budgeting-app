@@ -419,7 +419,7 @@ export default class LoanPage extends React.Component {
                   .filter(loan => {
                     return (
                       loan.recipient &&
-                      loan.paid &&
+                      !loan.paid &&
                       (!this.state.startDate ||
                         moment(loan.date).dayOfYear() >=
                           moment(this.state.startDate).dayOfYear()) &&
@@ -554,7 +554,7 @@ export default class LoanPage extends React.Component {
                   .filter(loan => {
                     return (
                       loan.donar &&
-                      loan.paid &&
+                      !loan.paid &&
                       (!this.state.startDate ||
                         moment(loan.date).dayOfYear() >=
                           moment(this.state.startDate).dayOfYear()) &&
