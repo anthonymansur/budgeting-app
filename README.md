@@ -4,6 +4,7 @@ Personal live project that is constantly being updated
 This app was made using the MERN stack. 
 
 How to use this app:
+
 0. Go to (https://mansur-budgeting.herokuapp.com/).
 1. Log into the app via Google or Facebook
 2. Create wallets, each with specific percentages that determines how your income will be allocated (e.g. Having 
