@@ -100,7 +100,7 @@ export default ({
           )}
           <FormGroup>
             <Label for="date">Date</Label>
-            <Input type="date" name="date" defaultValue={now} id="date" onChange={this.onChange} />
+            <Input type="date" name="date" defaultValue={now} id="date" onChange={onChange} />
           </FormGroup>
           {state.modalType === "add-money" ? (
             <FormGroup>
