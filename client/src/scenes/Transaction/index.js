@@ -112,6 +112,9 @@ export default class TransactionPage extends React.Component {
             ? !transaction.taxable
             : false
     });
+    console.log(moment(transaction.date)
+    .utc()
+    .format("YYYY-MM-DD"));
   }
 
   onChange = (event) => {
@@ -372,7 +375,7 @@ export default class TransactionPage extends React.Component {
               <Input
                 type="date"
                 name="date"
-                defaultValue={now}
+                defaultValue={this.state.modalDate}
                 onChange={this.onChange}
               />
             </FormGroup>

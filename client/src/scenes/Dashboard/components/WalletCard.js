@@ -13,7 +13,7 @@ export default ({ wallet, getWalletBalance, editWalletToggle, transactions }) =>
   const amount = parseFloat(getWalletBalance(wallet));
   let todaysBalance = 0.0;
   transactions.forEach(trans => {
-    if (moment(trans.date).isSame(now, "day")) {
+    if (moment(trans.date).utc().isSame(now)) {
       todaysBalance += trans.amount;
     } 
   });
