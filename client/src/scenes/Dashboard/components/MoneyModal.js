@@ -117,11 +117,7 @@ export default ({
                   </i>
                 }
                 value={state.modalValue}
-                onToggle={value => {
-                  this.setState({
-                    modalValue: !value
-                  });
-                }}
+                onToggle={onToggle}
               />
             </FormGroup>
           ) : (

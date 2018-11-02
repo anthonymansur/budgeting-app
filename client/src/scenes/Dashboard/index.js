@@ -48,19 +48,8 @@ export default class DashboardPage extends Component {
       modalPercentage: 0,
       modalValue: false,
       ismounted: false,
-      run: true,
-      steps: [
-        {
-          target: '.step-1',
-          content: 'This if my awesome feature!',
-          placement: 'bottom',
-        },
-        {
-          target: '.step-2',
-          content: 'This if my awesome feature!',
-          placement: 'bottom',
-        }
-      ]
+      modalWalletDate: "",
+      modalSetWalletDate: false
     };
   }
 
@@ -183,7 +172,13 @@ export default class DashboardPage extends Component {
           .tz(TIMEZONE)
           .format("YYYY-MM-DD")
       });
-    }
+    } else if (event.target.name === "walletDate") {
+      this.setState({
+        modalWalletDate: moment(event.target.value)
+        .tz(TIMEZONE)
+        .format("YYYY-MM-DD")
+      });
+    } 
   };
 
   refreshState = () => {
@@ -197,7 +192,9 @@ export default class DashboardPage extends Component {
       modalWallet: {},
       modalName: "",
       modalPercentage: 0,
-      modalValue: false
+      modalValue: false,
+      modalSetWalletDate: false,
+      modalWalletDate: ""
     };
     this.setState(newState);
   };
@@ -233,6 +230,12 @@ export default class DashboardPage extends Component {
       modal: !this.state.modal
     });
     this.refreshState();
+  };
+
+  toggleWalletDate = () => {
+    this.setState({
+      modalSetWalletDate: !this.state.modalSetWalletDate
+    });
   };
 
   addMoneyToggle = () => {
@@ -280,6 +283,50 @@ export default class DashboardPage extends Component {
     }
   };
 
+  submitWalletDate = async () => {
+    // Note to future self: check if user tries adding date < today's date
+    try {
+      const body = {
+        wallet_id: this.state.modalWallet._id,
+        update: {
+          date: moment(this.state.modalWalletDate).toDate()
+        }
+      };
+      const res = await axios.put("/api/wallets", body);
+        if (res.data.success) {
+          this.refreshState();
+          await this.componentDidMount();
+        } else {
+          alert(res.data.message);
+        }
+    } catch (e) {
+      console.log(e);
+      alert(e.message);
+    }
+  }
+
+  removeWalletDate = async () => {
+    // Note to future self: check if user tries adding date < today's date
+    try {
+      const body = {
+        wallet_id: this.state.modalWallet._id,
+        update: {
+          date: null
+        }
+      };
+      const res = await axios.put("/api/wallets", body);
+        if (res.data.success) {
+          this.refreshState();
+          await this.componentDidMount();
+        } else {
+          alert(res.data.message);
+        }
+    } catch (e) {
+      console.log(e);
+      alert(e.message);
+    }
+  }
+
   addWalletToggle = () => {
     this.setState({
       modal: !this.state.modal,
@@ -296,7 +343,8 @@ export default class DashboardPage extends Component {
       modalName: wallet.category,
       modalNameError: false,
       modalPercentage: wallet.percentage,
-      modalType: "edit-wallet"
+      modalType: "edit-wallet",
+      modalWalletDate: wallet.date
     });
   };
 
@@ -442,11 +490,6 @@ export default class DashboardPage extends Component {
   render() {
     return (
       <Container>
-        <Joyride
-            steps={this.state.steps}
-            run={this.state.run}
-            callback={this.callback}
-          />
         <Row>
           <Col md="3" />
           <Col md="6">
@@ -489,6 +532,13 @@ export default class DashboardPage extends Component {
                         getWalletBalance={this.getWalletBalance}
                         editWalletToggle={this.editWalletToggle}
                         wallet={wallet}
+                        transactions={this.state.transactions.filter(trans => {
+                          if (trans.wallet_id) {
+                            return trans.wallet_id._id === wallet._id
+                          } else {
+                            return false;
+                          }
+                        })}
                       />
                       <br />
                     </div>
@@ -559,6 +609,9 @@ export default class DashboardPage extends Component {
             addToWallet={this.addToWallet}
             editWallet={this.editWallet}
             confirmDelete={this.confirmDelete}
+            toggleWalletDate={this.toggleWalletDate}
+            submitWalletDate={this.submitWalletDate}
+            removeWalletDate={this.removeWalletDate}
           />
         ) : this.state.modalType === "new" && this.state.expandTransaction ? (
           <TransactionModal

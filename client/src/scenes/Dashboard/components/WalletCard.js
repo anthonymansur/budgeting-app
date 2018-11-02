@@ -1,18 +1,71 @@
 import React from "react";
-import { Card, CardBody, CardTitle } from "reactstrap";
+import { Card, CardBody, CardTitle, Row, Col } from "reactstrap";
 import numeral from "numeral";
+import moment from "moment-timezone";
 
-export default ({ wallet, getWalletBalance, editWalletToggle }) => {
+const TIMEZONE = "America/New_York";
+const now = moment().tz(TIMEZONE);
+
+export default ({ wallet, getWalletBalance, editWalletToggle, transactions }) => {
+  /*
+  * Used to get the daily balance if wallet has set date
+  */
+  const amount = parseFloat(getWalletBalance(wallet));
+  let todaysBalance = 0.0;
+  transactions.forEach(trans => {
+    if (moment(trans.date).isSame(now, "day")) {
+      todaysBalance += trans.amount;
+    } 
+  });
+  const daysRemaining = moment(wallet.date).diff(now, "days") + 1;
+  const average = (amount + todaysBalance) / daysRemaining;
+
   return (
     <Card onClick={() => editWalletToggle(wallet)}>
-      <CardBody className="text-center">
-        <CardTitle className="card__title">{wallet.category}</CardTitle>
-        {getWalletBalance(wallet) >= 0 ? (
-          <p className="card__money">{numeral(getWalletBalance(wallet)).format("$0,0.00")}</p>
-        ) : (
-          <p className="card__money--red">{numeral(getWalletBalance(wallet)).format("$0,0.00")}</p>
-        )}
-      </CardBody>
+      {!wallet.date ? (
+        <CardBody className="text-center">
+          <CardTitle className="card__title">{wallet.category}</CardTitle>
+          {getWalletBalance(wallet) >= 0 ? (
+            <p className="card__money">{numeral(getWalletBalance(wallet)).format("$0,0.00")}</p>
+          ) : (
+            <p className="card__money--red">
+              {numeral(getWalletBalance(wallet)).format("$0,0.00")}
+            </p>
+          )}
+        </CardBody>
+      ) : (
+        <CardBody className="text-center">
+          <CardTitle className="card__title">{wallet.category}</CardTitle>
+          <Row className="align-items-center">
+            <Col>
+              {getWalletBalance(wallet) >= 0 ? (
+                <p className="card__money">{numeral(getWalletBalance(wallet)).format("$0,0.00")}</p>
+              ) : (
+                <p className="card__money--red">
+                  {numeral(getWalletBalance(wallet)).format("$0,0.00")}
+                </p>
+              )}
+            </Col>
+            <Col className="text-right" style={{marginRight: "25px"}}>
+              <p style={{ margin: 0 }}>
+                Day Budget:{" "}
+                {(average - todaysBalance) >= 0 ? (
+                  <span className="medium-text green">${(average - todaysBalance).toFixed(2)}</span>
+                ) : (
+                  <span className="medium-text red">
+                    -$
+                    {(0 - (average - todaysBalance)).toFixed(2)}
+                  </span>
+                )}
+              </p>
+              <p style={{ margin: 0 }}>Per Day: <span className="medium-text green">${average.toFixed(2)}</span></p>
+            </Col>
+          </Row>
+          <p className="text-right" style={{ marginBottom: "-10px" }}>
+            {daysRemaining} days left
+          </p>
+        </CardBody>
+      )}
     </Card>
   );
 };

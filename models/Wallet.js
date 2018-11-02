@@ -8,7 +8,8 @@ const walletSchema = new Schema({
   user_id: {
     type: mongoose.Schema.ObjectId,
     ref: "User"
-  }
+  },
+  date: Date
 });
 
 module.exports = mongoose.model('Wallet', walletSchema);

@@ -9,10 +9,28 @@ import {
   FormGroup,
   Label,
   Input,
+  InputGroup,
+  InputGroupAddon,
   Button
 } from "reactstrap";
+import moment from "moment-timezone";
 
-export default ({ state, toggle, onChange, addToWallet, editWallet, confirmDelete }) => {
+const TIMEZONE = "America/New_York";
+const now = moment()
+  .tz(TIMEZONE)
+  .format("YYYY-MM-DD");
+
+export default ({
+  state,
+  toggle,
+  toggleWalletDate,
+  onChange,
+  addToWallet,
+  editWallet,
+  confirmDelete,
+  submitWalletDate,
+  removeWalletDate
+}) => {
   return (
     <Modal isOpen={state.modal} toggle={toggle}>
       <ModalHeader toggle={toggle}>
@@ -46,6 +64,37 @@ export default ({ state, toggle, onChange, addToWallet, editWallet, confirmDelet
               onChange={onChange}
             />
           </FormGroup>
+          {state.modalSetWalletDate === true ? (
+            <FormGroup>
+              <Label>How long do you intend to have this money for?</Label>
+              <InputGroup>
+                <Input
+                  type="date"
+                  name="walletDate"
+                  defaultValue={
+                    state.modalWalletDate
+                      ? moment(state.modalWalletDate)
+                          .tz(TIMEZONE)
+                          .format("YYYY-MM-DD")
+                      : now
+                  }
+                  onChange={onChange}
+                />
+                <InputGroupAddon addonType="append">
+                  <Button color="secondary" name="submitWalletDate" onClick={submitWalletDate}>
+                    Submit
+                  </Button>
+                </InputGroupAddon>
+              </InputGroup>
+              <Button color="link" onClick={removeWalletDate} style={{ padding: 0 }}>
+                Cancel
+              </Button>
+            </FormGroup>
+          ) : (
+            <Button color="link" onClick={toggleWalletDate} style={{ padding: 0 }}>
+              Set days remaining
+            </Button>
+          )}
         </Form>
       </ModalBody>
       <ModalFooter>
