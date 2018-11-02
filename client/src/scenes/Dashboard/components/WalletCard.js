@@ -11,14 +11,17 @@ export default ({ wallet, getWalletBalance, editWalletToggle, transactions }) =>
   * Used to get the daily balance if wallet has set date
   */
   const amount = parseFloat(getWalletBalance(wallet));
-  let todaysBalance = 0.0;
+  let todaysExpenses = 0;
   transactions.forEach(trans => {
-    if (moment(trans.date).utc().isSame(now, "day")) {
-      todaysBalance += trans.amount;
+    if (moment(trans.date).utc().isSame(now, "day") && trans.type === "remove") {
+      todaysExpenses += trans.amount;
     } 
   });
-  const daysRemaining = moment(wallet.date).diff(now, "days") + 1;
-  const average = (amount + todaysBalance) / daysRemaining;
+  const daysRemaining = moment(wallet.date).utc().diff(now, "days") + 1;
+  const average = (amount + todaysExpenses) / daysRemaining;
+
+  console.log(average);
+  console.log(todaysExpenses);
 
   return (
     <Card onClick={() => editWalletToggle(wallet)}>
@@ -49,12 +52,12 @@ export default ({ wallet, getWalletBalance, editWalletToggle, transactions }) =>
             <Col className="text-right" style={{marginRight: "25px"}}>
               <p style={{ margin: 0 }}>
                 Day Budget:{" "}
-                {(average - todaysBalance) >= 0 ? (
-                  <span className="medium-text green">${(average - todaysBalance).toFixed(2)}</span>
+                {(average - todaysExpenses) >= 0 ? (
+                  <span className="medium-text green">${(average - todaysExpenses).toFixed(2)}</span>
                 ) : (
                   <span className="medium-text red">
                     -$
-                    {(0 - (average - todaysBalance)).toFixed(2)}
+                    {(0 - (average - todaysExpenses)).toFixed(2)}
                   </span>
                 )}
               </p>

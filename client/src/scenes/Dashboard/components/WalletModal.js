@@ -90,11 +90,11 @@ export default ({
                 Cancel
               </Button>
             </FormGroup>
-          ) : (
+          ) : state.modalType !== "add-wallet" ? (
             <Button color="link" onClick={toggleWalletDate} style={{ padding: 0 }}>
               Set days remaining
             </Button>
-          )}
+          ) : ""}
         </Form>
       </ModalBody>
       <ModalFooter>

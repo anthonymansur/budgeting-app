@@ -354,6 +354,9 @@ export default class DashboardPage extends Component {
         category: this.state.modalName,
         percentage: this.state.modalPercentage
       };
+      if (this.state.modalWalletDate) {
+        body.date = this.state.modalWalletDate;
+      }
       try {
         const res = await axios.post("/api/wallets", body);
         if (!res.data.success) {
