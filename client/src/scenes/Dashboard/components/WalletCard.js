@@ -13,11 +13,22 @@ export default ({ wallet, getWalletBalance, editWalletToggle, transactions }) =>
   const amount = parseFloat(getWalletBalance(wallet));
   let todaysExpenses = 0;
   transactions.forEach(trans => {
-    if (moment(trans.date).utc().isSame(now, "day") && trans.type === "remove") {
+    if (
+      moment(trans.date)
+        .utc()
+        .dayOfYear() === now.dayOfYear() &&
+      moment(trans.date)
+        .utc()
+        .year() === now.year() &&
+      trans.type === "remove"
+    ) {
       todaysExpenses += trans.amount;
-    } 
+    }
   });
-  const daysRemaining = moment(wallet.date).utc().diff(now, "days") + 1;
+  const daysRemaining =
+    moment(wallet.date)
+      .utc()
+      .diff(now, "days") + 1;
   const average = (amount + todaysExpenses) / daysRemaining;
 
   console.log(average);
@@ -49,11 +60,13 @@ export default ({ wallet, getWalletBalance, editWalletToggle, transactions }) =>
                 </p>
               )}
             </Col>
-            <Col className="text-right" style={{marginRight: "25px"}}>
+            <Col className="text-right" style={{ marginRight: "25px" }}>
               <p style={{ margin: 0 }}>
                 Day Budget:{" "}
-                {(average - todaysExpenses) >= 0 ? (
-                  <span className="medium-text green">${(average - todaysExpenses).toFixed(2)}</span>
+                {average - todaysExpenses >= 0 ? (
+                  <span className="medium-text green">
+                    ${(average - todaysExpenses).toFixed(2)}
+                  </span>
                 ) : (
                   <span className="medium-text red">
                     -$
@@ -61,7 +74,9 @@ export default ({ wallet, getWalletBalance, editWalletToggle, transactions }) =>
                   </span>
                 )}
               </p>
-              <p style={{ margin: 0 }}>Per Day: <span className="medium-text green">${average.toFixed(2)}</span></p>
+              <p style={{ margin: 0 }}>
+                Per Day: <span className="medium-text green">${average.toFixed(2)}</span>
+              </p>
             </Col>
           </Row>
           <p className="text-right" style={{ marginBottom: "-10px" }}>
