@@ -36,11 +36,19 @@ passport.use(
         });
         if (existingUser) {
           if (!existingUser.emails || !existingUser.display_name) {
-            await User.findByIdAndUpdate(existingUser._id, { emails: profile.emails, display_name: profile.displayName });
+            await User.findByIdAndUpdate(existingUser._id, {
+              emails: profile.emails,
+              display_name: profile.displayName
+            });
           }
           return done(null, existingUser);
         }
-        const user = await new User({ googleId: profile.id, emails: profile.emails, display_name: profile.displayName }).save();
+        const user = await new User({
+          googleId: profile.id,
+          emails: profile.emails,
+          display_name: profile.displayName,
+          date_joined: new Date()
+        }).save();
         done(null, user);
       } catch (e) {
         console.log(e);
@@ -55,7 +63,7 @@ passport.use(
       clientID: keys.facebookAppId,
       clientSecret: keys.facebookAppSecret,
       callbackURL: "/auth/facebook/callback",
-      profileFields: ['id', 'email', 'displayName'],
+      profileFields: ["id", "email", "displayName"],
       proxy: true
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -66,11 +74,19 @@ passport.use(
         });
         if (existingUser) {
           if (!existingUser.emails || !existingUser.display_name) {
-            await User.findByIdAndUpdate(existingUser._id, { emails: profile.emails, display_name: profile.displayName });
+            await User.findByIdAndUpdate(existingUser._id, {
+              emails: profile.emails,
+              display_name: profile.displayName
+            });
           }
           return done(null, existingUser);
         }
-        const user = await new User({ facebookId: profile.id, emails: profile.emails, display_name: profile.displayName }).save();
+        const user = await new User({
+          facebookId: profile.id,
+          emails: profile.emails,
+          display_name: profile.displayName,
+          date_joined: new Date()
+        }).save();
         done(null, user);
       } catch (e) {
         console.log(e);

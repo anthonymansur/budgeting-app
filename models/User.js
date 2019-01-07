@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const Wallet = require('./Wallet');
+const Wallet = require("./Wallet");
 
 const userSchema = new Schema({
   googleId: String,
@@ -11,7 +11,8 @@ const userSchema = new Schema({
   display_tutorial: {
     type: Boolean,
     default: true
-  }
+  },
+  date_joined: Date
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
