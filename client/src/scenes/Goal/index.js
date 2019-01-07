@@ -422,7 +422,7 @@ export default class GoalPage extends React.Component {
             toggle={this.toggle}
             onChange={this.onChange}
             onAddSubmit={this.onAddSubmit}
-            onUpdateSubmit={this.onAddSubmit}
+            onUpdateSubmit={this.onUpdateSubmit}
             formattedNow={formattedNow}
           />
         ) : this.state.modalType === "transfer" ? (
