@@ -1,6 +1,8 @@
 # budgeting-app
 Personal live project that is constantly being updated
 
+For a walkthrough of how the app works, go to https://drive.google.com/file/d/1BxBy2ZnP1WUFMGKwdRLO_Wt7iWkgYSwB/view?usp=sharing
+
 This app was made using the MERN stack. 
 
 How to use this app:
