@@ -13,7 +13,9 @@ import {
   Input,
   InputGroup,
   InputGroupAddon,
-  FormFeedback
+  FormFeedback,
+  Row,
+  Col
 } from "reactstrap";
 import ToggleButton from "react-toggle-button";
 import axios from "axios";
@@ -44,10 +46,17 @@ export default ({ state, toggle, expandTransaction, onChange, onToggle, onEdit }
                   key={transaction._id}
                   onClick={() => expandTransaction(transaction)}
                 >
-                  <p>
-                    Amount:
-                    {" $" + transaction.amount}
-                  </p>
+                    <Row>
+                        <Col xs="9">
+                        <p>
+                            Amount:
+                            {" $" + transaction.amount}
+                        </p>
+                        </Col>
+                        <Col xs="3">
+                        </Col>
+                    </Row>
+                  
                   <p>
                     Date:
                     {" " + moment(transaction.date).format("MMMM DD, YYYY")}

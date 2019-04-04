@@ -31,9 +31,6 @@ export default ({ wallet, getWalletBalance, editWalletToggle, transactions }) =>
       .diff(now, "days") + 1;
   const average = (amount + todaysExpenses) / daysRemaining;
 
-  console.log(average);
-  console.log(todaysExpenses);
-
   return (
     <Card onClick={() => editWalletToggle(wallet)}>
       {!wallet.date ? (

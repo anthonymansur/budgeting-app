@@ -11,6 +11,7 @@ mongoose.connect(mongoURI);
 
 const app = express();
 
+// authentication
 app.use(bodyParser.json());
 app.use(
   cookieSession({
@@ -20,6 +21,16 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// authorization
+app.use("/api*", (req, res, next) => {
+  if (req.user === undefined) {
+    res.status(401);
+    return res.send("unauthorized");
+  } else {
+    next();
+  }
+});
 
 //routes
 require('./routes/authRoutes')(app);

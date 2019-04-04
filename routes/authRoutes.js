@@ -32,7 +32,7 @@ module.exports = app => {
     res.redirect("/");
   });
 
-  app.get("/api/current_user", (req, res) => {
+  app.get("/current_user", (req, res) => {
     res.send(req.user);
   });
   

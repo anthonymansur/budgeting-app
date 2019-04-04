@@ -9,6 +9,9 @@
     "/auth/facebook": {
       "target": "https://localhost:5000"
     },
+    "/current_user": {
+      "target": "http://localhost:5000"
+    },
     "/api/*": {
       "target": "http://localhost:5000"
     }

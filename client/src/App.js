@@ -22,7 +22,7 @@ export default class App extends Component {
   }
 
   async componentDidMount() {
-    this.user = await axios.get("/api/current_user");
+    this.user = await axios.get("/current_user");
     await this.setState({ auth: this.user.data ? true : false, ismounted: true });
   }
 
