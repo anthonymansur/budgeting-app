@@ -244,7 +244,8 @@ export default class DashboardPage extends Component {
       modalType: "add-money",
       modalCategory: null,
       modalDate: now,
-      modalValue: true
+      modalValue: true,
+      modalDescription: null
     });
   };
 
@@ -252,7 +253,8 @@ export default class DashboardPage extends Component {
     this.setState({
       modal: !this.state.modal,
       modalType: "remove-money",
-      modalValue: false
+      modalValue: false,
+      modalDescription: null
     });
   };
 
