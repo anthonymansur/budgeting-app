@@ -439,7 +439,7 @@ export default class DashboardPage extends Component {
   expandTransaction = transaction => {
     this.setState({
       expandTransaction: transaction,
-      modalDescription: this.state.modalDescription ? this.state.modalDescription : transaction.description
+      modalDescription: transaction.description
     });
   };
 

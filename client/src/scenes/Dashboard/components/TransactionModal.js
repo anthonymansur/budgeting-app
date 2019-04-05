@@ -53,8 +53,6 @@ export default ({ state, toggle, expandTransaction, onChange, onToggle, onEdit }
                             {" $" + transaction.amount}
                         </p>
                         </Col>
-                        <Col xs="3">
-                        </Col>
                     </Row>
                   
                   <p>
